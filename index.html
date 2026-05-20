@@ -180,10 +180,19 @@ function ss(u){Object.assign(S,u);render();}
 function playCorrect(){try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain();o.connect(g);g.connect(c.destination);o.type='square';o.frequency.setValueAtTime(988,c.currentTime);o.frequency.setValueAtTime(1319,c.currentTime+0.07);g.gain.setValueAtTime(0.15,c.currentTime);g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.35);o.start(c.currentTime);o.stop(c.currentTime+0.35);}catch(e){}}
 function playWrong(){try{const c=new(window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator(),g=c.createGain(),f=c.createBiquadFilter();o.connect(f);f.connect(g);g.connect(c.destination);o.type='sawtooth';o.frequency.setValueAtTime(110,c.currentTime);f.type='lowpass';f.frequency.setValueAtTime(700,c.currentTime);g.gain.setValueAtTime(0.22,c.currentTime);g.gain.setValueAtTime(0.22,c.currentTime+0.25);g.gain.exponentialRampToValueAtTime(0.001,c.currentTime+0.5);o.start(c.currentTime);o.stop(c.currentTime+0.5);}catch(e){}}
 
+const GEMINI_KEY='AIzaSyCcMhD18ySfUQCliCCgm8oZYk839NRCYvs';
 async function ai(sys,usr){
-  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1600,system:sys,messages:[{role:'user',content:usr}]})});
+  const r=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({
+      contents:[{parts:[{text:sys+'\n\n'+usr}]}],
+      generationConfig:{temperature:0.9,maxOutputTokens:1600}
+    })
+  });
   const d=await r.json();
-  return JSON.parse(d.content.map(x=>x.text||'').join('').replace(/```json|```/g,'').trim());
+  const txt=d.candidates[0].content.parts[0].text;
+  return JSON.parse(txt.replace(/```json|```/g,'').trim());
 }
 const rnd=()=>Math.floor(Math.random()*999983);
 
