@@ -2760,7 +2760,7 @@ function showTrophyCelebration(onDone) {
       color:#6C3FC8;letter-spacing:1px;margin-bottom:20px;">
       ${pieces} / ${total} COLLECTED!
     </div>
-    <button onclick="this.parentElement.remove();(${onDone.toString()})()"
+    <button id="awesome-btn"
       style="background:linear-gradient(135deg,#6C3FC8,#9B6FE8);color:white;
         font-family:'Bangers','Arial Black',sans-serif;font-size:28px;padding:16px 48px;
         border:none;border-radius:24px;cursor:pointer;letter-spacing:2px;
@@ -2769,6 +2769,10 @@ function showTrophyCelebration(onDone) {
     </button>`;
 
   document.body.appendChild(overlay);
+  document.getElementById('awesome-btn').addEventListener('click', ()=>{
+    overlay.remove();
+    onDone();
+  });
 }
 
 // ═══════════════════ PUZZLE SYSTEM ═══════════════════
