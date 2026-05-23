@@ -420,6 +420,15 @@ const FM={
   {q:"What is 9×9?",w:"81",v:"✖️"},
  ],
 };
+function flashCards(lv){
+ const rk=["easy","medium","hard"][lv-1];
+ const rp=FR[rk],mp=FM[rk];
+ const rw=rp.map(x=>x.w),mw=mp.map(x=>x.w);
+ const rc=pk(rp,20).map(r=>({type:"reading",question:r.q,answer:r.w,visual:r.v,choices:sh([r.w,...sh(rw.filter(x=>x!==r.w)).slice(0,3)])}));
+ const mc=pk(mp,20).map(m=>({type:"math",question:m.q,answer:m.w,visual:m.v,choices:sh([m.w,...sh(mw.filter(x=>x!==m.w)).slice(0,3)])}));
+ return sh([...rc,...mc]);
+}
+
 // FILL IN THE BLANK
 const FB={
  easy:[
