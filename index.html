@@ -575,6 +575,56 @@ function counting(lv){return Array.from({length:40},()=>{const max=lv===1?10:lv=
 function catSort(lv){return pk(CS[["easy","medium","hard"][lv-1]],40);}
 function placeValue(lv){return Array.from({length:40},()=>{let n,q,a,choices;if(lv===1){n=ri(10,99);const t=Math.random();if(t<.5){q=`How many TENS in ${n}?`;a=String(Math.floor(n/10));}else{q=`How many ONES in ${n}?`;a=String(n%10);}}else if(lv===2){n=ri(100,999);const t=Math.random();if(t<.33){q=`Hundreds digit in ${n}?`;a=String(Math.floor(n/100));}else if(t<.66){q=`Tens digit in ${n}?`;a=String(Math.floor((n%100)/10));}else{q=`Ones digit in ${n}?`;a=String(n%10);}}else{n=ri(1000,9999);const t=Math.random();if(t<.5){q=`What is ${n} rounded to nearest 10?`;a=String(Math.round(n/10)*10);}else{q=`What is ${n} rounded to nearest 100?`;a=String(Math.round(n/100)*100);}}const wrong=sh([String(parseInt(a)+1),String(parseInt(a)+2),String(Math.abs(parseInt(a)-1))]).filter(x=>x!==a).slice(0,3);choices=sh([a,...wrong]);return{question:q,answer:a,choices}});}
 function skipCounting(lv){return Array.from({length:40},()=>{const steps=lv===1?[2,5,10]:lv===2?[3,4,6,10]:[ 7,8,9,11,12];const step=rnd(steps);const start=ri(0,5)*step;const seq=[start,start+step,start+2*step];const ans=start+3*step;const wrong=[ans+step,ans-step,ans+2*step].filter(x=>x!==ans&&x>0);return{sequence:seq,answer:ans,step,choices:sh([ans,...sh(wrong).slice(0,3)])}});}
+function trueFalse(lv){
+ const easy=[
+  {s:"2+2=4",a:true,e:"✅"},{s:"3+3=7",a:false,e:"❌"},{s:"5-2=3",a:true,e:"✅"},
+  {s:"4+1=6",a:false,e:"❌"},{s:"6-3=3",a:true,e:"✅"},{s:"7+2=8",a:false,e:"❌"},
+  {s:"8-4=4",a:true,e:"✅"},{s:"9+1=10",a:true,e:"✅"},{s:"5+4=8",a:false,e:"❌"},
+  {s:"10-5=5",a:true,e:"✅"},{s:"A dog is an animal",a:true,e:"🐶"},
+  {s:"The sun comes out at night",a:false,e:"🌙"},{s:"Fish can fly",a:false,e:"🐟"},
+  {s:"Birds have feathers",a:true,e:"🐦"},{s:"Ice is hot",a:false,e:"🧊"},
+  {s:"Cats are mammals",a:true,e:"🐱"},{s:"Plants need sunlight to grow",a:true,e:"🌱"},
+  {s:"Rocks are living things",a:false,e:"🪨"},{s:"3+4=7",a:true,e:"✅"},
+  {s:"The Earth is flat",a:false,e:"🌍"},{s:"2×3=6",a:true,e:"✅"},
+  {s:"A triangle has 4 sides",a:false,e:"🔺"},{s:"10+10=20",a:true,e:"✅"},
+  {s:"Dogs can breathe underwater",a:false,e:"🐕"},{s:"Summer is warmer than winter",a:true,e:"☀️"},
+ ];
+ const medium=[
+  {s:"Photosynthesis makes food for plants",a:true,e:"🌿"},{s:"All mammals lay eggs",a:false,e:"🥚"},
+  {s:"The Moon orbits the Earth",a:true,e:"🌙"},{s:"Subtraction is the same as addition",a:false,e:"➖"},
+  {s:"Vertebrates have a backbone",a:true,e:"🦴"},{s:"Sound travels faster than light",a:false,e:"💡"},
+  {s:"Frogs are amphibians",a:true,e:"🐸"},{s:"A prime number has only 2 factors",a:true,e:"🔢"},
+  {s:"12×5=55",a:false,e:"✖️"},{s:"The perimeter is the distance around a shape",a:true,e:"📏"},
+  {s:"Adjectives describe nouns",a:true,e:"📝"},{s:"Adverbs describe nouns",a:false,e:"📝"},
+  {s:"Erosion wears away rock",a:true,e:"⛰️"},{s:"3/4 is less than 1/2",a:false,e:"½"},
+  {s:"Carnivores eat only plants",a:false,e:"🦁"},{s:"The water cycle includes evaporation",a:true,e:"💧"},
+  {s:"25×4=100",a:true,e:"✖️"},{s:"A decade is 100 years",a:false,e:"📅"},
+  {s:"Gravity pulls objects toward Earth",a:true,e:"⬇️"},{s:"All squares are rectangles",a:true,e:"🔷"},
+ ];
+ const hard=[
+  {s:"Metamorphosis describes insect life cycles",a:true,e:"🦋"},{s:"All cells have a nucleus",a:false,e:"🔬"},
+  {s:"The equator divides Earth into hemispheres",a:true,e:"🌍"},{s:"7×8=54",a:false,e:"✖️"},
+  {s:"Photosynthesis releases oxygen",a:true,e:"🌿"},{s:"Sedimentary rock forms from magma",a:false,e:"🪨"},
+  {s:"The area of a 4×6 rectangle is 24",a:true,e:"📐"},{s:"Prefixes come at the end of words",a:false,e:"🔤"},
+  {s:"Decomposers break down dead organisms",a:true,e:"🍄"},{s:"All polygons have curved sides",a:false,e:"🔷"},
+  {s:"A hypothesis must be testable",a:true,e:"🔬"},{s:"The denominator is the top of a fraction",a:false,e:"½"},
+  {s:"Vertebrates include fish reptiles and birds",a:true,e:"🐟"},{s:"9×9=82",a:false,e:"✖️"},
+  {s:"Evaporation turns liquid into gas",a:true,e:"💨"},{s:"A simile always uses like or as",a:true,e:"📖"},
+  {s:"Longitude lines run east to west",a:false,e:"🌍"},{s:"The perimeter of a square = 4×side",a:true,e:"📐"},
+  {s:"Ecosystems include both living and non-living things",a:true,e:"🌍"},{s:"Adverbs can describe adjectives",a:true,e:"📝"},
+ ];
+ return pk([easy,medium,hard][lv-1],40).map(r=>({s:r.s,a:r.a,e:r.e}));
+}
+function numOrder(lv){
+ return Array.from({length:40},()=>{
+  const count=lv===1?3:4;
+  const max=lv===1?10:lv===2?50:999;
+  const nums=[];
+  while(nums.length<count){const n=ri(1,max);if(!nums.includes(n))nums.push(n);}
+  const dir=Math.random()>.5?"asc":"desc";
+  return{numbers:sh(nums),direction:dir,question:`Put these numbers in ${dir==="asc"?"SMALLEST to BIGGEST":"BIGGEST to SMALLEST"} order!`};
+ });
+}
 
 // UNSCRAMBLE
 const UB={
