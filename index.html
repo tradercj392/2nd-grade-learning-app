@@ -566,7 +566,112 @@ function matchPairs(lv){const sizes={1:4,2:5,3:6};return pk(MP[["easy","medium",
 function mathPop(lv){return Array.from({length:40},()=>{let q,a;if(lv===1){const x=ri(1,10),y=ri(1,10);if(Math.random()>.5){q=`${x}+${y}`;a=x+y;}else{const s=x+y;q=`${s}-${x}`;a=y;}}else if(lv===2){const x=ri(10,50),y=ri(1,20);if(Math.random()>.5){q=`${x}+${y}`;a=x+y;}else{q=`${x}-${y}`;a=x-y;}}else{const t=Math.random();if(t<.5){const x=ri(2,9),y=ri(2,9);q=`${x}×${y}`;a=x*y;}else{const x=ri(10,100),y=ri(10,50);q=`${x}+${y}`;a=x+y;}}const w=String(a);return{q,w,v:"🔢",choices:sh([w,...new Array(3).fill(0).map(()=>{let r;do{r=String(a+ri(-5,5));}while(r===w||r===String(a));return r;})])}});}
 function fillBlank(lv){return pk(FB[["easy","medium","hard"][lv-1]],40);}
 function unscramble(lv){return pk(UB[["easy","medium","hard"][lv-1]],40);}
+const WP={
+ easy:[
+  // Grade 1 - match word to emoji
+  {word:"cat",ce:"🐱",o:["🐶","🐟","🐦","🐸"]},
+  {word:"dog",ce:"🐶",o:["🐱","🐟","🐦","🐸"]},
+  {word:"sun",ce:"☀️",o:["🌙","⭐","🌧️","❄️"]},
+  {word:"apple",ce:"🍎",o:["🍌","🍊","🍇","🍓"]},
+  {word:"house",ce:"🏠",o:["🏫","🏥","🏪","🏰"]},
+  {word:"car",ce:"🚗",o:["🚌","✈️","🚢","🚂"]},
+  {word:"tree",ce:"🌳",o:["🌸","🌻","🌵","🍄"]},
+  {word:"fish",ce:"🐟",o:["🐬","🦈","🐙","🦞"]},
+  {word:"book",ce:"📚",o:["📝","✏️","📏","🖍️"]},
+  {word:"ball",ce:"⚽",o:["🏀","🎾","⚾","🏈"]},
+  {word:"bird",ce:"🐦",o:["🦋","🐝","🐛","🐞"]},
+  {word:"moon",ce:"🌙",o:["☀️","⭐","🌈","☁️"]},
+  {word:"star",ce:"⭐",o:["🌙","☀️","🌈","❄️"]},
+  {word:"flower",ce:"🌸",o:["🌳","🌵","🍄","🌿"]},
+  {word:"cake",ce:"🎂",o:["🍕","🍔","🌮","🍜"]},
+  {word:"heart",ce:"❤️",o:["⭐","🔵","🟡","🟢"]},
+  {word:"clock",ce:"🕐",o:["📅","📆","⏰","⌛"]},
+  {word:"boat",ce:"⛵",o:["🚗","✈️","🚂","🚌"]},
+  {word:"rain",ce:"🌧️",o:["☀️","❄️","🌈","🌪️"]},
+  {word:"fire",ce:"🔥",o:["💧","❄️","🌊","☁️"]},
+ ],
+ medium:[
+  // Mix Grade 1-2
+  {word:"microscope",ce:"🔬",o:["🔭","📡","💊","🧪"]},
+  {word:"trophy",ce:"🏆",o:["🎖️","🥇","🎗️","🏅"]},
+  {word:"volcano",ce:"🌋",o:["⛰️","🏔️","🗻","🏝️"]},
+  {word:"rainbow",ce:"🌈",o:["☀️","🌧️","❄️","🌪️"]},
+  {word:"robot",ce:"🤖",o:["👾","🦾","🛸","💻"]},
+  {word:"planet",ce:"🪐",o:["⭐","🌙","☀️","🌍"]},
+  {word:"anchor",ce:"⚓",o:["🚢","⛵","🏄","🐬"]},
+  {word:"crown",ce:"👑",o:["💎","💍","🎩","🪄"]},
+  {word:"compass",ce:"🧭",o:["🗺️","📍","🔭","📡"]},
+  {word:"hourglass",ce:"⏳",o:["🕐","📅","⌚","🔔"]},
+  {word:"lightning",ce:"⚡",o:["🌧️","❄️","🔥","💧"]},
+  {word:"magnet",ce:"🧲",o:["🔧","⚙️","🔩","🪛"]},
+  {word:"telescope",ce:"🔭",o:["🔬","📡","💻","🧪"]},
+  {word:"tornado",ce:"🌪️",o:["🌧️","⛈️","🌊","❄️"]},
+  {word:"diamond",ce:"💎",o:["💍","👑","🏆","🪙"]},
+  {word:"volcano",ce:"🌋",o:["🏔️","⛰️","🏝️","🗻"]},
+  {word:"cactus",ce:"🌵",o:["🌳","🌸","🍄","🌿"]},
+  {word:"igloo",ce:"🏔️",o:["🏠","🏕️","⛺","🏰"]},
+  {word:"comet",ce:"☄️",o:["⭐","🌙","🪐","🌟"]},
+  {word:"galaxy",ce:"🌌",o:["☀️","🌙","⭐","🪐"]},
+ ],
+ hard:[
+  // Grade 2 - more complex concepts
+  {word:"photosynthesis",ce:"🌿",o:["🔬","💧","☀️","🌱"]},
+  {word:"democracy",ce:"🗳️",o:["👑","⚖️","🏛️","📜"]},
+  {word:"ecosystem",ce:"🌍",o:["🌿","🦁","💧","🌳"]},
+  {word:"hypothesis",ce:"🔬",o:["📋","💡","🧪","📊"]},
+  {word:"metamorphosis",ce:"🦋",o:["🐛","🥚","🐝","🐞"]},
+  {word:"evaporation",ce:"💨",o:["💧","❄️","🌊","🌧️"]},
+  {word:"constellation",ce:"✨",o:["🌙","☀️","🪐","☄️"]},
+  {word:"hibernation",ce:"🐻",o:["🦅","🐬","🦋","🐘"]},
+  {word:"tectonic",ce:"🌋",o:["🌊","⛰️","🏔️","🗻"]},
+  {word:"camouflage",ce:"🦎",o:["🐆","🦀","🐙","🦋"]},
+  {word:"symbiosis",ce:"🌸",o:["🐝","🌿","🍄","🌳"]},
+  {word:"precipitation",ce:"🌧️",o:["☁️","💧","❄️","🌊"]},
+  {word:"chromosome",ce:"🧬",o:["🔬","💊","🧪","🦠"]},
+  {word:"buoyancy",ce:"🚢",o:["⚓","🌊","🐬","🏄"]},
+  {word:"erosion",ce:"🪨",o:["🌊","💨","🌧️","🏔️"]},
+  {word:"migration",ce:"🦅",o:["🐻","🐬","🦋","🐘"]},
+  {word:"refraction",ce:"🌈",o:["💡","🔭","🔬","🌞"]},
+  {word:"decomposition",ce:"🍄",o:["🌿","🌱","🪱","🌳"]},
+  {word:"gravitational",ce:"🍎",o:["⬇️","🌍","🚀","⚖️"]},
+  {word:"biodiversity",ce:"🌍",o:["🌿","🦁","🐟","🦋"]},
+ ],
+};
 function wordPicture(lv){const d=WP[["easy","medium","hard"][lv-1]];return pk(d,40).map(r=>({word:r.word,correctEmoji:r.ce,choices:sh([r.ce,...r.o.slice(0,3)])}));}
+const RT={
+ easy:[
+  // Grade 1 - simple rhymes
+  {word:"cat",rhyme:"hat"},{word:"dog",rhyme:"log"},{word:"sun",rhyme:"fun"},
+  {word:"cake",rhyme:"lake"},{word:"tree",rhyme:"bee"},{word:"ball",rhyme:"wall"},
+  {word:"rain",rhyme:"train"},{word:"night",rhyme:"light"},{word:"book",rhyme:"cook"},
+  {word:"fish",rhyme:"dish"},{word:"map",rhyme:"nap"},{word:"pig",rhyme:"big"},
+  {word:"hop",rhyme:"top"},{word:"red",rhyme:"bed"},{word:"bug",rhyme:"hug"},
+  {word:"tin",rhyme:"win"},{word:"pup",rhyme:"cup"},{word:"fox",rhyme:"box"},
+  {word:"hen",rhyme:"ten"},{word:"jet",rhyme:"wet"},{word:"mop",rhyme:"pop"},
+  {word:"rug",rhyme:"tug"},{word:"sit",rhyme:"bit"},{word:"jam",rhyme:"ham"},
+  {word:"pan",rhyme:"man"},
+ ],
+ medium:[
+  // Mix Grade 1-2
+  {word:"bright",rhyme:"flight"},{word:"stone",rhyme:"bone"},{word:"dream",rhyme:"team"},
+  {word:"play",rhyme:"stay"},{word:"found",rhyme:"sound"},{word:"race",rhyme:"place"},
+  {word:"kind",rhyme:"mind"},{word:"gold",rhyme:"bold"},{word:"free",rhyme:"key"},
+  {word:"float",rhyme:"coat"},{word:"blow",rhyme:"snow"},{word:"great",rhyme:"late"},
+  {word:"sweet",rhyme:"beat"},{word:"grow",rhyme:"flow"},{word:"brave",rhyme:"cave"},
+  {word:"learn",rhyme:"turn"},{word:"clean",rhyme:"bean"},{word:"proud",rhyme:"cloud"},
+  {word:"sharp",rhyme:"carp"},{word:"treat",rhyme:"meat"},
+ ],
+ hard:[
+  // Grade 2
+  {word:"thought",rhyme:"caught"},{word:"through",rhyme:"grew"},{word:"knight",rhyme:"might"},
+  {word:"enough",rhyme:"rough"},{word:"light",rhyme:"height"},{word:"there",rhyme:"bear"},
+  {word:"would",rhyme:"could"},{word:"their",rhyme:"stare"},{word:"eight",rhyme:"weight"},
+  {word:"whole",rhyme:"stole"},{word:"write",rhyme:"quite"},{word:"known",rhyme:"shown"},
+  {word:"meant",rhyme:"tent"},{word:"search",rhyme:"church"},{word:"earth",rhyme:"worth"},
+  {word:"wealth",rhyme:"health"},{word:"touch",rhyme:"much"},{word:"young",rhyme:"lung"},
+  {word:"sword",rhyme:"bored"},{word:"gauge",rhyme:"age"},
+ ],
+};
 function rhymeTime(lv){const d=RT[["easy","medium","hard"][lv-1]];return pk(d,40).map(r=>{const wrong=sh(d.filter(x=>x.word!==r.word&&x.rhyme!==r.rhyme).map(x=>x.rhyme)).slice(0,3);return{word:r.word,answer:r.rhyme,choices:sh([r.rhyme,...wrong])}});}
 function wordFamily(lv){return pk(WF[["easy","medium","hard"][lv-1]],40);}
 function greaterLess(lv){return Array.from({length:40},()=>{let l,r,answer,question;const t=Math.random();if(lv===1){if(t<.15){l=ri(1,9);r=l;answer="equal";question="Compare these numbers:";}else{l=ri(1,9);r=ri(1,9);while(r===l)r=ri(1,9);const q=Math.random();question=q<.5?"Which is GREATER?":"Which is LESS?";answer=q<.5?(l>r?"left":"right"):(l<r?"left":"right");}}else if(lv===2){if(t<.2){l=ri(1,50);r=l;answer="equal";question="Compare these numbers:";}else{l=ri(1,50);r=ri(1,50);while(r===l)r=ri(1,50);const q=Math.random();question=q<.5?"Which is GREATER?":"Which is LESS?";answer=q<.5?(l>r?"left":"right"):(l<r?"left":"right");}}else{if(t<.25){l=ri(1,999);r=l;answer="equal";question="Compare these numbers:";}else{l=ri(1,999);r=ri(1,999);while(r===l)r=ri(1,999);const q=Math.random();question=q<.5?"Which is GREATER?":"Which is LESS?";answer=q<.5?(l>r?"left":"right"):(l<r?"left":"right");}}return{left:l,right:r,answer,question}});}
@@ -1829,7 +1934,7 @@ function rTF(el,rounds,lv,done){let i=0,sc=0,ch=null;function show(){if(ch===nul
 function rWP(el,rounds,lv,done){let i=0,sc=0,ch=null;function show(){if(ch===null)_advance=null;const r=rounds[i];const rv=ch!==null;el.innerHTML=`${pb(i,rounds.length,sc)}<div class="card">${ms(i===0&&!rv?'greet':rv?(r.choices[ch]===r.correctEmoji?'correct':'wrong'):'idle','wordpicture')}${lbl("🖼️","WORD TO PICTURE","#F5A623")}<div style="text-align:center;margin-bottom:12px;"><div style="font-size:13px;color:#A89CC8;margin-bottom:8px;font-family:'Nunito',sans-serif;">Tap the picture that matches!</div><div style="font-family:'Bangers','Arial Black',sans-serif;font-size:36px;color:#1A0A3E;background:linear-gradient(135deg,#FFF8E1,#FFF3CD);border-radius:18px;padding:10px 24px;display:inline-block;letter-spacing:3px;">${r.word.toUpperCase()}</div></div><div class="g2" style="gap:12px;">${r.choices.map((c,ci)=>{const isC=c===r.correctEmoji;const tp=ch===ci;let bg="rgba(255,248,225,.5)",bo="2px solid rgba(245,166,35,.3)";if(rv&&isC){bg="#E8FFF4";bo="3px solid #00D68F";}else if(tp&&!isC){bg="#FFF0F2";bo="3px solid #FF4757";}return `<button class="wp" data-ci="${ci}" style="background:${bg};border:${bo};border-radius:20px;padding:18px 8px;font-size:48px;cursor:${rv?"default":"pointer"};animation:${rv&&isC?"pop .35s ease":`bFloat ${1.3+ci*.25}s ease-in-out infinite`};">${c}${rv&&isC?'<div style="font-size:13px;margin-top:2px;">✅</div>':tp&&!isC?'<div style="font-size:13px;margin-top:2px;">❌</div>':""}</button>`;}).join("")}</div>${rv?`<div style="text-align:center;margin-top:12px;animation:fadeUp .3s ease;">${r.choices[ch]===r.correctEmoji?`<div style="font-family:'Bangers','Arial Black',sans-serif;font-size:24px;color:#00D68F;letter-spacing:1.5px;">🎉 THAT'S THE ONE!</div>`:`<div style="font-family:'Bangers','Arial Black',sans-serif;font-size:20px;color:#FF4757;letter-spacing:1px;">😅 IT WAS <span style="font-size:26px;">${r.correctEmoji}</span></div>`}</div>`:""}${maybeNextBtn(i,rounds.length)}</div>`;if(!rv)pendingTap(el,".wp",()=>ch!==null,(ci,b)=>{ch=parseInt(ci);const ok=rounds[i].choices[ch]===rounds[i].correctEmoji;ok?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||15;if(ns>=thr||i+1>=rounds.length)done(ns,Math.min(i+1,rounds.length));else{sc=ns;i++;ch=null;show();}};show();});}show();}
 
 // G8 Number Order
-function rNO(el,rounds,lv,done){let i=0,sc=0;function ir(){let order=[...rounds[i].numbers],sel=null,fb2=null;function show(){if(fb2===null)_advance=null;const r=rounds[i];el.innerHTML=`${pb(i,rounds.length,sc)}<div class="card">${lbl("📊","NUMBER ORDER","#00D68F")}<div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:15px;color:#6B5F8A;text-align:center;margin-bottom:8px;">Tap two numbers to swap — put them <span style="color:#00D68F;font-weight:900;">${r.label}</span>!</div><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;">${order.map((n,j)=>`<button class="no" data-j="${j}" style="width:54px;height:54px;border-radius:14px;background:${sel===j?"linear-gradient(135deg,#00D68F,#00E5A0)":fb2==="ok"?"#E8FFF4":fb2==="no"?"#FFF0F2":"linear-gradient(135deg,#F8F7FF,#F0EFF8)"};border:${sel===j?"3px solid #00A86B":fb2==="ok"?"3px solid #00D68F":fb2==="no"?"3px solid #FF4757":"2px solid #E0DCF0"};font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:${sel===j?"white":fb2==="ok"?"#00A86B":fb2==="no"?"#CC2F3E":"#1A0A3E"};cursor:pointer;animation:${fb2==="ok"?`pop .3s ease ${j*.08}s both`:"none"};">${n}</button>`).join("")}</div>${fb2?`<div style="text-align:center;animation:fadeUp .3s ease;">${fb2==="ok"?`<div style="font-family:'Bangers','Arial Black',sans-serif;font-size:24px;color:#00D68F;letter-spacing:1.5px;">🎉 PERFECT ORDER!</div>`:`<div><div style="font-family:'Bangers','Arial Black',sans-serif;font-size:17px;color:#FF4757;letter-spacing:1px;">😅 THE ORDER WAS:</div><div style="display:flex;gap:7px;justify-content:center;margin-top:7px;">${[...r.numbers].sort((a,b)=>r.direction==="asc"?a-b:b-a).map(n=>`<div style="width:50px;height:50px;border-radius:12px;background:#E8FFF4;border:2px solid #00D68F;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:19px;color:#00A86B;">${n}</div>`).join("")}</div></div>`}</div>`:`<button class="btn bs cn" style="letter-spacing:1px;">✓ CHECK ORDER</button>`}${maybeNextBtn(i,rounds.length)}</div>`;if(!fb2){el.querySelectorAll(".no").forEach(b=>b.addEventListener("click",()=>{const j=parseInt(b.dataset.j);if(sel===null){sel=j;show();}else if(sel===j){sel=null;show();}else{[order[sel],order[j]]=[order[j],order[sel]];sel=null;show();}}));const cn=el.querySelector(".cn");if(cn)cn.addEventListener("click",()=>{const sorted=[...rounds[i].numbers].sort((a,b)=>rounds[i].direction==="asc"?a-b:b-a);const ok=order.join(",")===sorted.join(",");fb2=ok?"ok":"no";ok?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||15;if(ns>=thr||i+1>=rounds.length)done(ns,Math.min(i+1,rounds.length));else{sc=ns;i++;ir();}};show();});}}show();}ir();}
+function rNO(el,rounds,lv,done){let i=0,sc=0;function ir(){let order=[...rounds[i].numbers],sel=null,fb2=null;function show(){if(fb2===null)_advance=null;const r=rounds[i];el.innerHTML=`${pb(i,rounds.length,sc)}<div class="card" style="overflow-y:auto;max-height:calc(100vh - 160px);">${lbl("📊","NUMBER ORDER","#00D68F")}<div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:15px;color:#6B5F8A;text-align:center;margin-bottom:8px;">Tap two numbers to swap — put them <span style="color:#00D68F;font-weight:900;">${r.direction==="asc"?"SMALLEST → BIGGEST":"BIGGEST → SMALLEST"}</span>!</div><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;">${order.map((n,j)=>`<button class="no" data-j="${j}" style="width:54px;height:54px;border-radius:14px;background:${sel===j?"linear-gradient(135deg,#00D68F,#00E5A0)":fb2==="ok"?"#E8FFF4":fb2==="no"?"#FFF0F2":"linear-gradient(135deg,#F8F7FF,#F0EFF8)"};border:${sel===j?"3px solid #00A86B":fb2==="ok"?"3px solid #00D68F":fb2==="no"?"3px solid #FF4757":"2px solid #E0DCF0"};font-family:'Nunito',sans-serif;font-weight:900;font-size:22px;color:${sel===j?"white":fb2==="ok"?"#00A86B":fb2==="no"?"#CC2F3E":"#1A0A3E"};cursor:pointer;animation:${fb2==="ok"?`pop .3s ease ${j*.08}s both`:"none"};">${n}</button>`).join("")}</div>${fb2?`<div style="text-align:center;animation:fadeUp .3s ease;">${fb2==="ok"?`<div style="font-family:'Bangers','Arial Black',sans-serif;font-size:24px;color:#00D68F;letter-spacing:1.5px;">🎉 PERFECT ORDER!</div>`:`<div><div style="font-family:'Bangers','Arial Black',sans-serif;font-size:17px;color:#FF4757;letter-spacing:1px;">😅 THE ORDER WAS:</div><div style="display:flex;gap:7px;justify-content:center;margin-top:7px;">${[...r.numbers].sort((a,b)=>r.direction==="asc"?a-b:b-a).map(n=>`<div style="width:50px;height:50px;border-radius:12px;background:#E8FFF4;border:2px solid #00D68F;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif;font-weight:900;font-size:19px;color:#00A86B;">${n}</div>`).join("")}</div></div>`}</div>`:`<button class="btn bs cn" style="letter-spacing:1px;">✓ CHECK ORDER</button>`}${maybeNextBtn(i,rounds.length)}</div>`;if(!fb2){el.querySelectorAll(".no").forEach(b=>b.addEventListener("click",()=>{const j=parseInt(b.dataset.j);if(sel===null){sel=j;show();}else if(sel===j){sel=null;show();}else{[order[sel],order[j]]=[order[j],order[sel]];sel=null;show();}}));const cn=el.querySelector(".cn");if(cn)cn.addEventListener("click",()=>{const sorted=[...rounds[i].numbers].sort((a,b)=>rounds[i].direction==="asc"?a-b:b-a);const ok=order.join(",")===sorted.join(",");fb2=ok?"ok":"no";ok?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||15;if(ns>=thr||i+1>=rounds.length)done(ns,Math.min(i+1,rounds.length));else{sc=ns;i++;ir();}};show();});}}show();}ir();}
 
 // G9 Rhyme Time
 function rRhyme(el,rounds,lv,done){let i=0,sc=0,ch=null;function show(){if(ch===null)_advance=null;const r=rounds[i];const rv=ch!==null;el.innerHTML=`${pb(i,rounds.length,sc)}<div class="card">${ms(i===0&&!rv?'greet':rv?(r.choices[ch]?.toLowerCase()===r.answer.toLowerCase()?'correct':'wrong'):'idle','rhymetime')}${lbl("🎵","RHYME TIME","#FF6B9D")}<div style="text-align:center;margin-bottom:10px;">${r.visual?`<div style="font-size:44px;margin-bottom:6px;">${r.visual}</div>`:""}<div style="font-size:13px;color:#A89CC8;font-family:'Nunito',sans-serif;margin-bottom:4px;">Which word rhymes with...</div><div style="font-family:'Bangers','Arial Black',sans-serif;font-size:36px;color:#1A0A3E;letter-spacing:3px;background:linear-gradient(135deg,#FFF0F7,#FFE4F0);border-radius:14px;padding:8px 20px;display:inline-block;">${r.word.toUpperCase()}</div></div><div class="g2">${r.choices.map((c,ci)=>{const isC=c.toLowerCase()===r.answer.toLowerCase();const tp=ch===ci;let bg="rgba(255,107,157,.08)",bo="2px solid rgba(255,107,157,.2)",tc="#1A0A3E";if(rv&&isC){bg="#E8FFF4";bo="2px solid #00D68F";tc="#00A86B";}else if(tp&&!isC){bg="#FFF0F2";bo="2px solid #FF4757";tc="#CC2F3E";}return `<button class="rh" data-ci="${ci}" style="background:${bg};border:${bo};border-radius:14px;padding:15px 8px;font-family:'Nunito',sans-serif;font-weight:800;font-size:20px;color:${tc};cursor:${rv?"default":"pointer"};animation:${rv&&isC?"pop .35s ease":"none"};">${rv&&isC?"✅ ":tp&&!isC?"❌ ":""}${c}</button>`;}).join("")}</div>${rv?`<div style="text-align:center;margin-top:12px;animation:fadeUp .3s ease;">${r.choices[ch]?.toLowerCase()===r.answer.toLowerCase()?`<div style="font-family:'Bangers','Arial Black',sans-serif;font-size:24px;color:#00D68F;letter-spacing:1.5px;">🎉 THEY RHYME!</div>`:`<div style="font-weight:800;font-size:17px;color:#FF4757;font-family:'Nunito',sans-serif;">😅 <span style="color:#1A0A3E;">${r.word}</span> rhymes with <span style="color:#00D68F;">${r.answer}</span>!</div>`}</div>`:""}${maybeNextBtn(i,rounds.length)}</div>`;if(!rv)pendingTap(el,".rh",()=>ch!==null,(ci,b)=>{ch=parseInt(ci);const ok=rounds[i].choices[ch]?.toLowerCase()===rounds[i].answer.toLowerCase();ok?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||15;if(ns>=thr||i+1>=rounds.length)done(ns,Math.min(i+1,rounds.length));else{sc=ns;i++;ch=null;show();}};show();});}show();}
@@ -1844,7 +1949,7 @@ function rGL(el,rounds,lv,done){let i=0,sc=0,ch=null;function show(){if(ch===nul
 </div>${nb("right")}</div> ${rv?`<div style="text-align:center;animation:fadeUp .3s ease;"><div style="font-family:'Bangers','Arial Black',sans-serif;font-size:20px;color:${ok?"#00D68F":"#FF4757"};letter-spacing:1px;">${ok?"🎉 CORRECT!":"😅 ANSWER: "+`<span style="font-family:'Nunito',sans-serif;font-weight:900;color:#1A0A3E;">${r.answer==="left"?r.left:r.answer==="right"?r.right:"Equal!"}</span>`}</div></div>`:""}${maybeNextBtn(i,rounds.length)}</div>`;if(!rv)pendingTap(el,".glb",()=>ch!==null,(side,b)=>{ch=side;const ok=ch===rounds[i].answer;ok?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||15;if(ns>=thr||i+1>=rounds.length)done(ns,Math.min(i+1,rounds.length));else{sc=ns;i++;ch=null;show();}};show();});}show();}
 
 // G12 Odd One Out
-function rOdd(el,rounds,lv,done){let i=0,sc=0,ch=null;function show(){if(ch===null)_advance=null;const r=rounds[i];const rv=ch!==null;el.innerHTML=`${pb(i,rounds.length,sc)}<div class="card">${ms(i===0&&!rv?'greet':rv?(r.choices[ch]?.toLowerCase()===r.answer.toLowerCase()?'correct':'wrong'):'idle','oddoneout')}${lbl("🚫","ODD ONE OUT","#FF4757")}<div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:20px;color:#1A0A3E;text-align:center;margin-bottom:12px;background:#FFF5F5;border-radius:12px;padding:10px;">Which one does <span style="color:#FF4757;font-weight:900;">NOT</span> belong?</div><div class="g2" style="gap:11px;">${r.choices.map((c,ci)=>{const isO=c.toLowerCase()===r.answer.toLowerCase();const tp=ch===ci;let bg="rgba(255,71,87,.06)",bo="2px solid rgba(255,71,87,.15)",tc="#1A0A3E";if(rv&&isO){bg="#E8FFF4";bo="3px solid #00D68F";tc="#00A86B";}else if(tp&&!isO){bg="#FFF0F2";bo="3px solid #FF4757";tc="#CC2F3E";}else if(rv&&!isO){bg="rgba(200,200,200,.2)";bo="2px solid #ddd";tc="#999";}return `<button class="oo" data-ci="${ci}" style="background:${bg};border:${bo};border-radius:16px;padding:17px 9px;font-family:'Nunito',sans-serif;font-weight:800;font-size:20px;color:${tc};cursor:${rv?"default":"pointer"};animation:${rv&&isO?"pop .35s ease":"none"};">${rv&&isO?"🚫 ":tp&&!isO?"❌ ":""}${c}</button>`;}).join("")}</div>${rv?`<div style="text-align:center;margin-top:12px;animation:fadeUp .3s ease;">${r.choices[ch]?.toLowerCase()===r.answer.toLowerCase()?`<div style="font-family:'Bangers','Arial Black',sans-serif;font-size:20px;color:#00D68F;letter-spacing:1.5px;">🎉 YOU FOUND IT!</div>`:`<div style="font-family:'Bangers','Arial Black',sans-serif;font-size:17px;color:#FF4757;letter-spacing:1px;">😅 ODD ONE: <span style="font-family:'Nunito',sans-serif;font-weight:800;color:#1A0A3E;">${r.answer}</span></div>`}<div style="font-family:'Nunito',sans-serif;font-size:12px;color:#A89CC8;margin-top:3px;">${r.reason}</div></div>`:""}${maybeNextBtn(i,rounds.length)}</div>`;if(!rv)pendingTap(el,".oo",()=>ch!==null,(ci,b)=>{ch=parseInt(ci);const ok=rounds[i].choices[ch]?.toLowerCase()===rounds[i].answer.toLowerCase();ok?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||15;if(ns>=thr||i+1>=rounds.length)done(ns,Math.min(i+1,rounds.length));else{sc=ns;i++;ch=null;show();}};show();});}show();}
+function rOdd(el,rounds,lv,done){let i=0,sc=0,ch=null,lastOk=null;function show(){if(ch===null)_advance=null;const r=rounds[i];const rv=ch!==null;el.innerHTML=`${pb(i,rounds.length,sc)}<div class="card">${ms(i===0&&!rv?'greet':rv?(lastOk!==null?lastOk?'correct':'wrong':r.choices[ch]?.toLowerCase()===r.answer.toLowerCase()?'correct':'wrong'):'idle','oddoneout')}${lbl("🚫","ODD ONE OUT","#FF4757")}<div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:20px;color:#1A0A3E;text-align:center;margin-bottom:12px;background:#FFF5F5;border-radius:12px;padding:10px;">Which one does <span style="color:#FF4757;font-weight:900;">NOT</span> belong?</div><div class="g2" style="gap:11px;">${r.choices.map((c,ci)=>{const isO=c.toLowerCase()===r.answer.toLowerCase();const tp=ch===ci;let bg="rgba(255,71,87,.06)",bo="2px solid rgba(255,71,87,.15)",tc="#1A0A3E";if(rv&&isO){bg="#E8FFF4";bo="3px solid #00D68F";tc="#00A86B";}else if(tp&&!isO){bg="#FFF0F2";bo="3px solid #FF4757";tc="#CC2F3E";}else if(rv&&!isO){bg="rgba(200,200,200,.2)";bo="2px solid #ddd";tc="#999";}return `<button class="oo" data-ci="${ci}" style="background:${bg};border:${bo};border-radius:16px;padding:17px 9px;font-family:'Nunito',sans-serif;font-weight:800;font-size:20px;color:${tc};cursor:${rv?"default":"pointer"};animation:${rv&&isO?"pop .35s ease":"none"};">${rv&&isO?"🚫 ":tp&&!isO?"❌ ":""}${c}</button>`;}).join("")}</div>${rv?`<div style="text-align:center;margin-top:12px;animation:fadeUp .3s ease;">${r.choices[ch]?.toLowerCase()===r.answer.toLowerCase()?`<div style="font-family:'Bangers','Arial Black',sans-serif;font-size:20px;color:#00D68F;letter-spacing:1.5px;">🎉 YOU FOUND IT!</div>`:`<div style="font-family:'Bangers','Arial Black',sans-serif;font-size:17px;color:#FF4757;letter-spacing:1px;">😅 ODD ONE: <span style="font-family:'Nunito',sans-serif;font-weight:800;color:#1A0A3E;">${r.answer}</span></div>`}<div style="font-family:'Nunito',sans-serif;font-size:12px;color:#A89CC8;margin-top:3px;">${r.reason}</div></div>`:""}${maybeNextBtn(i,rounds.length)}</div>`;if(!rv)pendingTap(el,".oo",()=>ch!==null,(ci,b)=>{ch=parseInt(ci);const ok=rounds[i].choices[ch]?.toLowerCase()===rounds[i].answer.toLowerCase();lastOk=ok;ok?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||15;if(ns>=thr||i+1>=rounds.length)done(ns,Math.min(i+1,rounds.length));else{sc=ns;i++;ch=null;lastOk=null;show();}};show();});}show();}
 
 // G13 Counting
 function rCount(el,rounds,lv,done){let i=0,sc=0,ch=null;function show(){if(ch===null)_advance=null;const r=rounds[i];const rv=ch!==null;el.innerHTML=`${pb(i,rounds.length,sc)}<div class="card">${ms(i===0&&!rv?'greet':rv?(r.choices[ch]===r.count?'correct':'wrong'):'idle','counting')}${lbl("🔢","COUNTING","#F5A623")}<div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;color:#6B5F8A;text-align:center;margin-bottom:10px;">How many are there?</div><div style="background:linear-gradient(135deg,#FFFDE7,#FFF8E1);border:2px solid rgba(245,166,35,.3);border-radius:18px;padding:14px;margin-bottom:10px;display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:2px;min-height:68px;font-size:${r.count>12?26:32}px;">${Array.from({length:r.count}).map(()=>r.emoji).join("")}</div><div class="g2">${r.choices.map((c,ci)=>{const isC=c===r.count;const tp=ch===ci;let bg="rgba(255,217,61,.1)",bo="2px solid rgba(255,217,61,.3)",tc="#1A0A3E";if(rv&&isC){bg="#E8FFF4";bo="3px solid #00D68F";tc="#00A86B";}else if(tp&&!isC){bg="#FFF0F2";bo="3px solid #FF4757";tc="#CC2F3E";}else if(rv){bg="rgba(200,200,200,.2)";bo="2px solid #ddd";tc="#999";}return `<button class="ct" data-ci="${ci}" style="background:${bg};border:${bo};border-radius:14px;padding:15px 8px;font-family:'Nunito',sans-serif;font-weight:900;font-size:26px;color:${tc};cursor:${rv?"default":"pointer"};animation:${rv&&isC?"pop .35s ease":"none"};">${rv&&isC?"✅ ":tp&&!isC?"❌ ":""}${c}</button>`;}).join("")}</div>${rv?`<div style="text-align:center;margin-top:10px;animation:fadeUp .3s ease;">${r.choices[ch]===r.count?`<div style="font-family:'Bangers','Arial Black',sans-serif;font-size:24px;color:#00D68F;letter-spacing:1.5px;">🎉 THAT'S RIGHT — ${r.count}!</div>`:`<div style="font-family:'Bangers','Arial Black',sans-serif;font-size:20px;color:#FF4757;letter-spacing:1px;">😅 THERE WERE <span style="font-family:'Nunito',sans-serif;font-weight:900;color:#1A0A3E;">${r.count}</span>!</div>`}</div>`:""}${maybeNextBtn(i,rounds.length)}</div>`;if(!rv)pendingTap(el,".ct",()=>ch!==null,(ci,b)=>{ch=parseInt(ci);const ok=rounds[i].choices[ch]===rounds[i].count;ok?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||15;if(ns>=thr||i+1>=rounds.length)done(ns,Math.min(i+1,rounds.length));else{sc=ns;i++;ch=null;show();}};show();});}show();}
@@ -1887,13 +1992,19 @@ function rTT(el,rounds,lv,done){let i=0,sc=0,ch=null;function dc(h,m){
   const hA=(h%12)*30+(m*.5);
   const mA=m*6;
   return `<div class="cf">
-    <div style="position:absolute;width:8px;height:8px;background:#6C3FC8;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3;"></div>
-    <div class="ch" style="width:7px;height:30px;background:#1A0A3E;left:calc(50% - 3.5px);transform:rotate(${hA}deg);border-radius:4px 4px 0 0;"></div>
-    <div class="ch" style="width:3px;height:46px;background:#FF4757;left:calc(50% - 1.5px);transform:rotate(${mA}deg);border-radius:3px 3px 0 0;"></div>
-    <div class="cn" style="top:4px;left:50%;transform:translateX(-50%);">12</div>
-    <div class="cn" style="right:6px;top:50%;transform:translateY(-50%);">3</div>
-    <div class="cn" style="bottom:4px;left:50%;transform:translateX(-50%);">6</div>
-    <div class="cn" style="left:6px;top:50%;transform:translateY(-50%);">9</div>
+    <div style="position:absolute;width:9px;height:9px;background:#6C3FC8;border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3;"></div>
+    <div class="ch" style="width:8px;height:28px;background:#3D5AFE;left:calc(50% - 4px);transform:rotate(${hA}deg);border-radius:4px 4px 0 0;z-index:2;"></div>
+    <div class="ch" style="width:3px;height:48px;background:#FF4757;left:calc(50% - 1.5px);transform:rotate(${mA}deg);border-radius:3px 3px 0 0;z-index:1;"></div>
+    <div style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);font-size:8px;color:#999;font-family:Nunito,sans-serif;">H=short M=long</div>
+    <div class="cn" style="top:2px;left:50%;transform:translateX(-50%);">12</div>
+    <div class="cn" style="right:4px;top:50%;transform:translateY(-50%);">3</div>
+    <div class="cn" style="bottom:2px;left:50%;transform:translateX(-50%);">6</div>
+    <div class="cn" style="left:4px;top:50%;transform:translateY(-50%);">9</div>
+    <div class="cn" style="top:14px;right:22px;font-size:9px;">2</div>
+    <div class="cn" style="top:14px;left:22px;font-size:9px;">10</div>
+    <div class="cn" style="bottom:14px;right:22px;font-size:9px;">4</div>
+    <div class="cn" style="bottom:14px;left:22px;font-size:9px;">8</div>
+    <div style="position:absolute;bottom:-22px;left:0;right:0;text-align:center;font-size:10px;color:#9B6FE8;font-family:'Nunito',sans-serif;font-weight:700;">🔵 hour · 🔴 minute</div>
   </div>`;
 }function show(){if(ch===null)_advance=null;const r=rounds[i];const rv=ch!==null;el.innerHTML=`${pb(i,rounds.length,sc)}<div class="card">${ms(i===0&&!rv?'greet':rv?(String((r.choices||[])[ch])===r.displayTime?'correct':'wrong'):'idle','tellingtime')}${lbl("🕐","TELLING TIME","#D980FA")}<div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:15px;color:#6B5F8A;text-align:center;margin-bottom:8px;background:#F9F0FF;border-radius:12px;padding:8px;">${r.question}</div>${dc(r.hours,r.minutes)}<div class="g2" style="margin-top:12px;">${(r.choices||[]).map((c,ci)=>{const isC=String(c)===String(r.displayTime);const tp=ch===ci;let bg="rgba(217,128,250,.08)",bo="2px solid rgba(217,128,250,.2)",tc="#1A0A3E";if(rv&&isC){bg="#E8FFF4";bo="2px solid #00D68F";tc="#00A86B";}else if(tp&&!isC){bg="#FFF0F2";bo="2px solid #FF4757";tc="#CC2F3E";}return `<button class="tt2" data-ci="${ci}" style="background:${bg};border:${bo};border-radius:14px;padding:14px 8px;font-family:'Bangers','Arial Black',sans-serif;font-size:26px;color:${tc};letter-spacing:1px;cursor:${rv?"default":"pointer"};animation:${rv&&isC?"pop .35s ease":"none"};">${rv&&isC?"✅ ":tp&&!isC?"❌ ":""}${c}</button>`;}).join("")}</div>${rv?fb(String((r.choices||[])[ch])===String(r.displayTime),r.displayTime):""}${maybeNextBtn(i,rounds.length)}</div>`;if(!rv)pendingTap(el,".tt2",()=>ch!==null,(ci,b)=>{ch=parseInt(ci);const ok=String(rounds[i].choices[ch])===String(rounds[i].displayTime);ok?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||15;if(ns>=thr||i+1>=rounds.length)done(ns,Math.min(i+1,rounds.length));else{sc=ns;i++;ch=null;show();}};show();});}show();}
 
