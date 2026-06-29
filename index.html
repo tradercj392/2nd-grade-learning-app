@@ -225,7 +225,7 @@ const SHELDON_HOST = {
     "Oops! Let's look at that again 🧐","Almost! Sheldon believes in you!","Not quite — but you're SO close!","Hmm, good try! Here's a hint 💡","Don't give up — Sheldon never gives up!","That one was tricky! Keep going!","Whoops! Even wizards make mistakes!","No worries — let's learn from it!","You'll get the next one! 🚀"
   ],
   hints: {
-    flashcards: ["Look at the question carefully!","Think about what you know!","Take your time — you've got this!"],
+    flashcards: ["Tap the 🔊 to hear the word again!","Listen closely, then pick the word you heard!"],
     mathpop:    ["Count on your fingers if you need to!","Break it into smaller parts!","Think step by step!"],
     fillblank:  ["Read the whole sentence first!","Which word makes the most sense?","Say it out loud in your head!"],
     truefalse:  ["Think about what you know is TRUE!","Use your common sense!","Eliminate what seems wrong!"],
@@ -247,6 +247,7 @@ const SHELDON_HOST = {
     money:      ["Count the biggest coins first!","Quarters=25¢, Dimes=10¢, Nickels=5¢, Pennies=1¢"],
     science:    ["Think about what you've learned about nature!","Look at the emoji for a clue!","Remember: plants, animals, Earth, and forces!","Break the question into parts!"],
     numorder:   ["Which number is smallest? Put that first!","Count up slowly to find the order!"],
+    mathstory:  ["Read the story, then add or take away!","'gets more' means add, 'gives away' means take away!"],
   },
 
   say(type, gameId) {
@@ -347,80 +348,86 @@ function playWrongFX(buttonEl) {
 // FLASH CARDS - reading words
 const FR={
  level1:[
-  // Early 1st - Pre-K/K sight word recognition
-  {q:"Which spelling is correct?",w:"the",v:""},{q:"Which spelling is correct?",w:"a",v:""},
-  {q:"Which spelling is correct?",w:"is",v:""},{q:"Which spelling is correct?",w:"in",v:""},
-  {q:"Which spelling is correct?",w:"it",v:""},{q:"Which spelling is correct?",w:"to",v:""},
-  {q:"Which spelling is correct?",w:"and",v:""},{q:"Which spelling is correct?",w:"he",v:""},
-  {q:"Which spelling is correct?",w:"we",v:""},{q:"Which spelling is correct?",w:"my",v:""},
-  {q:"Which spelling is correct?",w:"go",v:""},{q:"Which spelling is correct?",w:"up",v:""},
-  {q:"Which spelling is correct?",w:"can",v:""},{q:"Which spelling is correct?",w:"see",v:""},
-  {q:"Which spelling is correct?",w:"me",v:""},{q:"Which spelling is correct?",w:"at",v:""},
-  {q:"Which spelling is correct?",w:"no",v:""},{q:"Which spelling is correct?",w:"big",v:""},
-  {q:"Which spelling is correct?",w:"run",v:""},{q:"Which spelling is correct?",w:"do",v:""},
-  {q:"What does this word mean?",w:"big",v:"🐘"},{q:"What does this word mean?",w:"run",v:"🏃"},
-  {q:"What does this word mean?",w:"cat",v:"🐱"},{q:"What does this word mean?",w:"sun",v:"☀️"},
-  {q:"What does this word mean?",w:"red",v:"🔴"},
+ // Picture -> word (K-2)
+  {q:"What is this?",w:"dog",v:"🐶"},
+  {q:"What is this?",w:"cat",v:"🐱"},
+  {q:"What is this?",w:"sun",v:"☀️"},
+  {q:"What is this?",w:"moon",v:"🌙"},
+  {q:"What is this?",w:"star",v:"⭐"},
+  {q:"What is this?",w:"apple",v:"🍎"},
+  {q:"What is this?",w:"ball",v:"🏀"},
+  {q:"What is this?",w:"car",v:"🚗"},
+  {q:"What is this?",w:"tree",v:"🌳"},
+  {q:"What is this?",w:"bee",v:"🐝"},
+  {q:"What is this?",w:"frog",v:"🐸"},
+  {q:"What is this?",w:"fish",v:"🐟"},
+  {q:"What is this?",w:"duck",v:"🦆"},
+  {q:"What is this?",w:"bird",v:"🐦"},
+  {q:"What is this?",w:"cow",v:"🐄"},
+  {q:"What is this?",w:"pig",v:"🐷"},
+  {q:"What is this?",w:"hat",v:"🎩"},
+  {q:"What is this?",w:"milk",v:"🥛"}
  ],
  level2:[
-  // Mid 1st - Grade 1 sight words
-  {q:"Which spelling is correct?",w:"said",v:""},{q:"Which spelling is correct?",w:"you",v:""},
-  {q:"Which spelling is correct?",w:"she",v:""},{q:"Which spelling is correct?",w:"they",v:""},
-  {q:"Which spelling is correct?",w:"like",v:""},{q:"Which spelling is correct?",w:"have",v:""},
-  {q:"Which spelling is correct?",w:"with",v:""},{q:"Which spelling is correct?",w:"what",v:""},
-  {q:"Which spelling is correct?",w:"are",v:""},{q:"Which spelling is correct?",w:"this",v:""},
-  {q:"Which spelling is correct?",w:"here",v:""},{q:"Which spelling is correct?",w:"was",v:""},
-  {q:"Which spelling is correct?",w:"look",v:""},{q:"Which spelling is correct?",w:"come",v:""},
-  {q:"Which spelling is correct?",w:"not",v:""},{q:"Which spelling is correct?",w:"all",v:""},
-  {q:"What does 'little' mean?",w:"small",v:"🐭"},{q:"What does 'funny' mean?",w:"makes you laugh",v:"😂"},
-  {q:"What does 'happy' mean?",w:"feeling good",v:"😊"},{q:"What does 'fast' mean?",w:"quick",v:"⚡"},
-  {q:"What is the opposite of hot?",w:"cold",v:"🧊"},{q:"What is the opposite of big?",w:"small",v:"🐭"},
-  {q:"What is the opposite of day?",w:"night",v:"🌙"},{q:"What is the opposite of up?",w:"down",v:"⬇️"},
-  {q:"What is the opposite of sad?",w:"happy",v:"😊"},
+  {q:"What is this?",w:"rabbit",v:"🐰"},
+  {q:"What is this?",w:"flower",v:"🌸"},
+  {q:"What is this?",w:"banana",v:"🍌"},
+  {q:"What is this?",w:"horse",v:"🐴"},
+  {q:"What is this?",w:"train",v:"🚂"},
+  {q:"What is this?",w:"house",v:"🏠"},
+  {q:"What is this?",w:"mouse",v:"🐭"},
+  {q:"What is this?",w:"lion",v:"🦁"},
+  {q:"What is this?",w:"tiger",v:"🐯"},
+  {q:"What is this?",w:"grapes",v:"🍇"},
+  {q:"What is this?",w:"carrot",v:"🥕"},
+  {q:"What is this?",w:"pizza",v:"🍕"},
+  {q:"What is this?",w:"shoe",v:"👟"},
+  {q:"What is this?",w:"sock",v:"🧦"},
+  {q:"What is this?",w:"boat",v:"⛵"},
+  {q:"What is this?",w:"snake",v:"🐍"},
+  {q:"What is this?",w:"clock",v:"🕐"},
+  {q:"What is this?",w:"cake",v:"🍰"}
  ],
  level3:[
-  // Late 1st - vocabulary and word meaning
-  {q:"Which spelling is correct?",w:"could",v:""},{q:"Which spelling is correct?",w:"would",v:""},
-  {q:"Which spelling is correct?",w:"their",v:""},{q:"Which spelling is correct?",w:"there",v:""},
-  {q:"Which spelling is correct?",w:"because",v:""},{q:"Which spelling is correct?",w:"before",v:""},
-  {q:"Which spelling is correct?",w:"always",v:""},{q:"Which spelling is correct?",w:"around",v:""},
-  {q:"Which spelling is correct?",w:"found",v:""},{q:"Which spelling is correct?",w:"which",v:""},
-  {q:"What does 'curious' mean?",w:"eager to know",v:"🧐"},{q:"What does 'enormous' mean?",w:"very large",v:"🐘"},
-  {q:"What does 'brave' mean?",w:"not afraid",v:"🦁"},{q:"What does 'ancient' mean?",w:"very old",v:"🏛️"},
-  {q:"What does 'silent' mean?",w:"very quiet",v:"🤫"},{q:"A synonym for 'happy'?",w:"joyful",v:"😊"},
-  {q:"A synonym for 'big'?",w:"large",v:"📏"},{q:"A synonym for 'fast'?",w:"quick",v:"⚡"},
-  {q:"An antonym for 'cold'?",w:"hot",v:"🔥"},{q:"An antonym for 'loud'?",w:"quiet",v:"🤫"},
-  {q:"What is a noun?",w:"a person place or thing",v:"📝"},
-  {q:"What is a verb?",w:"an action word",v:"⚡"},
-  {q:"What is an adjective?",w:"a describing word",v:"✨"},
-  {q:"What makes a complete sentence?",w:"subject and verb",v:"📖"},
-  {q:"What does a period do?",w:"ends a sentence",v:"."},
+  {q:"What is this?",w:"monkey",v:"🐒"},
+  {q:"What is this?",w:"penguin",v:"🐧"},
+  {q:"What is this?",w:"dolphin",v:"🐬"},
+  {q:"What is this?",w:"rocket",v:"🚀"},
+  {q:"What is this?",w:"rainbow",v:"🌈"},
+  {q:"What is this?",w:"balloon",v:"🎈"},
+  {q:"What is this?",w:"guitar",v:"🎸"},
+  {q:"What is this?",w:"pencil",v:"✏️"},
+  {q:"What is this?",w:"cookie",v:"🍪"},
+  {q:"What is this?",w:"turtle",v:"🐢"},
+  {q:"What is this?",w:"butterfly",v:"🦋"},
+  {q:"What is this?",w:"umbrella",v:"☂️"},
+  {q:"What is this?",w:"sandwich",v:"🥪"},
+  {q:"What is this?",w:"octopus",v:"🐙"},
+  {q:"What is this?",w:"robot",v:"🤖"},
+  {q:"What is this?",w:"candy",v:"🍬"},
+  {q:"What is this?",w:"ghost",v:"👻"},
+  {q:"What is this?",w:"crown",v:"👑"}
  ],
  level4:[
-  // 2nd grade - academic vocabulary
-  {q:"Which spelling is correct?",w:"although",v:""},{q:"Which spelling is correct?",w:"different",v:""},
-  {q:"Which spelling is correct?",w:"important",v:""},{q:"Which spelling is correct?",w:"enough",v:""},
-  {q:"Which spelling is correct?",w:"usually",v:""},{q:"Which spelling is correct?",w:"whether",v:""},
-  {q:"What does 'perseverance' mean?",w:"keep trying",v:"💪"},
-  {q:"What does 'transparent' mean?",w:"see-through",v:"🔍"},
-  {q:"What does 'fragile' mean?",w:"easily broken",v:"🥚"},
-  {q:"What does 'collaborate' mean?",w:"work together",v:"🤝"},
-  {q:"What does 'deduce' mean?",w:"figure out from clues",v:"🔍"},
-  {q:"What does 'abundant' mean?",w:"very plentiful",v:"🌿"},
-  {q:"What does 'evidence' mean?",w:"proof or facts",v:"📋"},
-  {q:"What does 'conclusion' mean?",w:"final decision",v:"📝"},
-  {q:"What is a prefix?",w:"word part at the beginning",v:"🔤"},
-  {q:"What is a suffix?",w:"word part at the end",v:"🔤"},
-  {q:"What does 'un-' mean?",w:"not or opposite",v:"❌"},
-  {q:"What does '-ful' mean?",w:"full of",v:"💯"},
-  {q:"What is a compound word?",w:"two words joined together",v:"🔗"},
-  {q:"What is a synonym?",w:"a word with same meaning",v:"📝"},
-  {q:"What is an antonym?",w:"a word with opposite meaning",v:"🔄"},
-  {q:"What is a contraction?",w:"two words joined with apostrophe",v:"'"},
-  {q:"What is the main idea?",w:"what the text is mostly about",v:"📖"},
-  {q:"What is a fact?",w:"something proven true",v:"✅"},
-  {q:"What is an opinion?",w:"what someone thinks or feels",v:"💭"},
- ],
+  {q:"What is this?",w:"elephant",v:"🐘"},
+  {q:"What is this?",w:"strawberry",v:"🍓"},
+  {q:"What is this?",w:"watermelon",v:"🍉"},
+  {q:"What is this?",w:"hamburger",v:"🍔"},
+  {q:"What is this?",w:"pineapple",v:"🍍"},
+  {q:"What is this?",w:"mushroom",v:"🍄"},
+  {q:"What is this?",w:"snowman",v:"⛄"},
+  {q:"What is this?",w:"volcano",v:"🌋"},
+  {q:"What is this?",w:"giraffe",v:"🦒"},
+  {q:"What is this?",w:"dinosaur",v:"🦕"},
+  {q:"What is this?",w:"kangaroo",v:"🦘"},
+  {q:"What is this?",w:"helicopter",v:"🚁"},
+  {q:"What is this?",w:"flamingo",v:"🦩"},
+  {q:"What is this?",w:"peacock",v:"🦚"},
+  {q:"What is this?",w:"raccoon",v:"🦝"},
+  {q:"What is this?",w:"lobster",v:"🦞"},
+  {q:"What is this?",w:"octopus",v:"🐙"},
+  {q:"What is this?",w:"butterfly",v:"🦋"}
+ ]
 };
 const FM = {
  level1:[
@@ -480,7 +487,7 @@ function flashCards(lv){
  const rk=["level1","level2","level3","level4"][lv-1];
  const rp=FR[rk];
  const rw=[...new Set(rp.map(x=>x.w))];
- return pk(rp,20).map(r=>({type:"reading",question:r.q,answer:r.w,visual:r.v,choices:sh([r.w,...sh(rw.filter(x=>x!==r.w)).slice(0,3)])}));
+ return pk(rp,20).map(r=>({type:"reading",audio:true,question:"Which word did you hear?",answer:r.w,visual:r.v,choices:sh([r.w,...sh(rw.filter(x=>x!==r.w)).slice(0,3)])}));
 }
 function flashCardsMath(lv){
  // Math only - used in Math category
@@ -918,40 +925,70 @@ function trueFalseRead(lv){
   {s:"Verbs are action words",a:true,e:"⚡"},{s:"The sky is usually blue",a:true,e:"🌤️"},
  ];
  const level2=[
-  {s:"Adjectives describe nouns",a:true,e:"📝"},{s:"Adverbs describe verbs",a:true,e:"📝"},
-  {s:"A noun is a person place or thing",a:true,e:"📝"},{s:"A question ends with a period",a:false,e:"?"},
-  {s:"Synonyms have opposite meanings",a:false,e:"📝"},{s:"Antonyms have opposite meanings",a:true,e:"🔄"},
-  {s:"A compound word is two words joined",a:true,e:"🔗"},{s:"Frogs are reptiles",a:false,e:"🐸"},
-  {s:"The Moon orbits the Earth",a:true,e:"🌙"},{s:"All mammals lay eggs",a:false,e:"🥚"},
-  {s:"Photosynthesis makes food for plants",a:true,e:"🌿"},{s:"Sound travels faster than light",a:false,e:"💡"},
-  {s:"Vertebrates have a backbone",a:true,e:"🦴"},{s:"Carnivores eat only plants",a:false,e:"🦁"},
-  {s:"Caterpillars turn into butterflies",a:true,e:"🦋"},{s:"A prefix comes at the start of a word",a:true,e:"🔤"},
-  {s:"A suffix comes at the start of a word",a:false,e:"🔤"},{s:"Hibernation is when animals sleep through winter",a:true,e:"🐻"},
-  {s:"Plants make food using photosynthesis",a:true,e:"🌿"},{s:"Erosion wears away rock",a:true,e:"⛰️"},
+  {s:"A cow says moo",a:true,e:"🐄"},
+  {s:"A fish lives in a tree",a:false,e:"🐟"},
+  {s:"Bees make honey",a:true,e:"🐝"},
+  {s:"Snow is hot",a:false,e:"❄️"},
+  {s:"We use our eyes to see",a:true,e:"👀"},
+  {s:"A car can fly",a:false,e:"🚗"},
+  {s:"Frogs can jump",a:true,e:"🐸"},
+  {s:"The sun is cold",a:false,e:"☀️"},
+  {s:"Milk comes from cows",a:true,e:"🥛"},
+  {s:"Spiders have two legs",a:false,e:"🕷️"},
+  {s:"A baby dog is called a puppy",a:true,e:"🐶"},
+  {s:"Apples are blue",a:false,e:"🍎"},
+  {s:"Rain makes things wet",a:true,e:"🌧️"},
+  {s:"You sleep with your eyes open",a:false,e:"😴"},
+  {s:"Ducks can swim",a:true,e:"🦆"},
+  {s:"Fire is cold",a:false,e:"🔥"},
+  {s:"We wear shoes on our feet",a:true,e:"👟"},
+  {s:"A week has ten days",a:false,e:"📅"},
+  {s:"Bananas are yellow",a:true,e:"🍌"},
+  {s:"Cats can talk like people",a:false,e:"🐱"}
  ];
  const level3=[
-  {s:"A simile uses like or as to compare",a:true,e:"📖"},{s:"A metaphor uses like or as",a:false,e:"📖"},
-  {s:"Alliteration repeats beginning sounds",a:true,e:"📖"},{s:"The protagonist is the villain",a:false,e:"📖"},
-  {s:"Prefixes come at the end of words",a:false,e:"🔤"},{s:"The suffix -ful means full of",a:true,e:"🔤"},
-  {s:"The prefix un- means not",a:true,e:"🔤"},{s:"A haiku has 5-7-5 syllables",a:true,e:"📖"},
-  {s:"Fiction stories are always true",a:false,e:"📖"},{s:"Biographies are about real people",a:true,e:"📖"},
-  {s:"The main idea is what a text is mostly about",a:true,e:"📝"},{s:"Facts and opinions are the same thing",a:false,e:"📝"},
-  {s:"Ecosystems include living and non-living things",a:true,e:"🌍"},{s:"Decomposers break down dead organisms",a:true,e:"🍄"},
-  {s:"Longitude lines run east to west",a:false,e:"🌍"},{s:"Metamorphosis describes insect life cycles",a:true,e:"🦋"},
-  {s:"All cells have a nucleus",a:false,e:"🔬"},{s:"The equator divides Earth into hemispheres",a:true,e:"🌍"},
-  {s:"Sedimentary rock forms from magma",a:false,e:"🪨"},{s:"A hypothesis must be testable",a:true,e:"🔬"},
+  {s:"A spider has eight legs",a:true,e:"🕷️"},
+  {s:"Plants can walk around",a:false,e:"🌱"},
+  {s:"The moon comes out at night",a:true,e:"🌙"},
+  {s:"Ice cream is hot",a:false,e:"🍦"},
+  {s:"A triangle has three sides",a:true,e:"🔺"},
+  {s:"Birds have teeth",a:false,e:"🐦"},
+  {s:"Butterflies start as caterpillars",a:true,e:"🦋"},
+  {s:"Rocks can grow like plants",a:false,e:"🪨"},
+  {s:"We breathe air to live",a:true,e:"💨"},
+  {s:"The ocean is full of sand, not water",a:false,e:"🌊"},
+  {s:"A baby cat is called a kitten",a:true,e:"🐱"},
+  {s:"Two plus two equals five",a:false,e:"➕"},
+  {s:"Bears sleep a lot in winter",a:true,e:"🐻"},
+  {s:"Trees can run fast",a:false,e:"🌳"},
+  {s:"Honey is sweet",a:true,e:"🍯"},
+  {s:"You can see stars on a sunny day",a:false,e:"⭐"},
+  {s:"A circle is round",a:true,e:"⭕"},
+  {s:"Dogs lay eggs",a:false,e:"🐶"},
+  {s:"Snails are very slow",a:true,e:"🐌"},
+  {s:"Winter is the hottest season",a:false,e:"❄️"}
  ];
  const level4=[
-  {s:"Personification gives human traits to objects",a:true,e:"📖"},{s:"Onomatopoeia is a figure of speech using sound words",a:true,e:"📖"},
-  {s:"A thesis statement comes at the end of an essay",a:false,e:"📝"},{s:"Foreshadowing hints at future events",a:true,e:"📖"},
-  {s:"A sonnet has 14 lines",a:true,e:"📖"},{s:"Connotation is the literal dictionary meaning",a:false,e:"📝"},
-  {s:"Point of view affects how a story is told",a:true,e:"📖"},{s:"Expository writing tells a story",a:false,e:"📝"},
-  {s:"Persuasive writing tries to change your mind",a:true,e:"📝"},{s:"A suffix changes the meaning of a root word",a:true,e:"🔤"},
-  {s:"All living things are made of cells",a:true,e:"🔬"},{s:"DNA carries genetic information",a:true,e:"🧬"},
-  {s:"The water cycle includes condensation",a:true,e:"💧"},{s:"Tectonic plates never move",a:false,e:"🌋"},
-  {s:"Light travels slower than sound",a:false,e:"💡"},{s:"Ecosystems can recover from disturbances",a:true,e:"🌍"},
-  {s:"Fossils are remains of living things",a:true,e:"🦕"},{s:"All planets orbit the Moon",a:false,e:"🪐"},
-  {s:"Renewable energy comes from unlimited sources",a:true,e:"♻️"},{s:"Photosynthesis requires darkness",a:false,e:"🌿"},
+  {s:"An insect has six legs",a:true,e:"🐜"},
+  {s:"A whale is a fish",a:false,e:"🐋"},
+  {s:"A noun is a naming word",a:true,e:"📝"},
+  {s:"All birds can fly",a:false,e:"🐦"},
+  {s:"Caterpillars change into butterflies",a:true,e:"🦋"},
+  {s:"The sun goes around the Earth",a:false,e:"☀️"},
+  {s:"Plants need water and sunlight to grow",a:true,e:"🌱"},
+  {s:"Fish can live out of water",a:false,e:"🐟"},
+  {s:"A baby cow is called a calf",a:true,e:"🐄"},
+  {s:"There are five days in a week",a:false,e:"📅"},
+  {s:"Water turns into ice when it is very cold",a:true,e:"🧊"},
+  {s:"Cats have feathers",a:false,e:"🐱"},
+  {s:"A verb is an action word",a:true,e:"🏃"},
+  {s:"The Earth has no air",a:false,e:"🌍"},
+  {s:"Bats can fly",a:true,e:"🦇"},
+  {s:"Tomatoes grow underground",a:false,e:"🍅"},
+  {s:"A rhyming word for 'cat' is 'hat'",a:true,e:"😺"},
+  {s:"Every sentence ends with a question mark",a:false,e:"❓"},
+  {s:"Some animals wake up at night",a:true,e:"🦉"},
+  {s:"Snow falls in the summer",a:false,e:"⛄"}
  ];
  return pk([level1,level2,level3,level4][lv-1]||level4,40).map(r=>({s:r.s,a:r.a,e:r.e}));
 }
@@ -1254,70 +1291,52 @@ const CS={
   {categoryA:"Sweet foods 🍬",categoryB:"Salty foods 🧂",wordsA:sh(["candy","cake","cookie","honey"]),wordsB:sh(["chip","pretzel","popcorn","pickle"])},
  ],
  level2:[
-  {categoryA:"Nouns 📝",categoryB:"Verbs ⚡",wordsA:sh(["dog","table","cloud","river"]),wordsB:sh(["swim","bake","climb","shout"])},
-  {categoryA:"Living things 🌱",categoryB:"Non-living things 🪨",wordsA:sh(["tree","worm","mushroom","seaweed"]),wordsB:sh(["rock","cloud","water","glass"])},
-  {categoryA:"2D Shapes 📐",categoryB:"3D Shapes 📦",wordsA:sh(["circle","square","triangle","pentagon"]),wordsB:sh(["cube","sphere","cone","pyramid"])},
-  {categoryA:"Warm blooded 🔥",categoryB:"Cold blooded 🧊",wordsA:sh(["dog","eagle","whale","rabbit"]),wordsB:sh(["lizard","frog","salmon","turtle"])},
-  {categoryA:"Things that float 🚢",categoryB:"Things that sink ⚓",wordsA:sh(["boat","leaf","balloon","foam"]),wordsB:sh(["rock","coin","anchor","nail"])},
-  {categoryA:"Words that can be nouns AND verbs 📝⚡",categoryB:"Words that are ONLY adjectives ✨",wordsA:sh(["swim","fly","run","jump"]),wordsB:sh(["vivid","enormous","fragile","transparent"])},
-  {categoryA:"Solids 🧱",categoryB:"Liquids 💧",wordsA:sh(["rock","wood","ice","bread"]),wordsB:sh(["water","juice","milk","oil"])},
-  {categoryA:"Renewable energy ♻️",categoryB:"Non-renewable energy ⛽",wordsA:sh(["solar","wind","hydro","geothermal"]),wordsB:sh(["coal","oil","gas","nuclear"])},
-  {categoryA:"Vertebrates 🦴",categoryB:"Invertebrates 🪱",wordsA:sh(["fish","frog","eagle","dog"]),wordsB:sh(["worm","jellyfish","snail","spider"])},
-  {categoryA:"Addition facts ➕",categoryB:"Multiplication facts ✖️",wordsA:sh(["3+4=7","5+6=11","8+2=10","9+3=12"]),wordsB:sh(["3×4=12","5×6=30","8×2=16","9×3=27"])},
-  {categoryA:"Adjectives ✨",categoryB:"Adverbs 💨",wordsA:sh(["happy","tall","red","brave"]),wordsB:sh(["quickly","slowly","loudly","gently"])},
-  {categoryA:"Herbivores 🌿",categoryB:"Carnivores 🥩",wordsA:sh(["rabbit","deer","cow","elephant"]),wordsB:sh(["lion","eagle","shark","snake"])},
-  {categoryA:"Odd numbers 🔢",categoryB:"Even numbers 🔢",wordsA:sh(["1","3","7","9"]),wordsB:sh(["2","4","6","8"])},
-  {categoryA:"Prefixes re- ♻️",categoryB:"Prefixes un- ❌",wordsA:sh(["redo","reuse","replay","rewrite"]),wordsB:sh(["undo","unhappy","unfair","unkind"])},
-  {categoryA:"Producers 🌿",categoryB:"Consumers 🦁",wordsA:sh(["oak tree","grass","seaweed","rose bush"]),wordsB:sh(["lion","rabbit","eagle","wolf"])},
-  {categoryA:"Fiction 📖",categoryB:"Non-fiction 📰",wordsA:sh(["fairy tale","fantasy","fable","myth"]),wordsB:sh(["biography","report","encyclopedia","news"])},
-  {categoryA:"Synonyms for happy 😊",categoryB:"Synonyms for sad 😢",wordsA:sh(["joyful","cheerful","delighted","gleeful"]),wordsB:sh(["gloomy","miserable","sorrowful","downcast"])},
-  {categoryA:"Past tense 📅",categoryB:"Present tense ⏰",wordsA:sh(["jumped","ran","ate","swam"]),wordsB:sh(["jump","run","eat","swim"])},
-  {categoryA:"Planets 🪐",categoryB:"Moons & Stars ⭐",wordsA:sh(["Jupiter","Mars","Saturn","Earth"]),wordsB:sh(["Luna","Titan","Sun","Sirius"])},
-  {categoryA:"Fractions less than half ½",categoryB:"Fractions more than half ½",wordsA:sh(["1/4","1/3","2/8","1/6"]),wordsB:sh(["3/4","2/3","5/8","4/5"])},
+  {categoryA:"Pets 🐶",categoryB:"Wild Animals 🦁",wordsA:sh(["dog","cat","fish","bird"]),wordsB:sh(["lion","tiger","bear","wolf"])},
+  {categoryA:"Things that Go 🚗",categoryB:"Things that Grow 🌱",wordsA:sh(["car","bus","truck","bike"]),wordsB:sh(["tree","flower","grass","seed"])},
+  {categoryA:"In the Sky ☁️",categoryB:"On the Ground 🌍",wordsA:sh(["sun","cloud","bird","moon"]),wordsB:sh(["rock","grass","ant","bug"])},
+  {categoryA:"Things you Eat 🍎",categoryB:"Things you Wear 👕",wordsA:sh(["apple","bread","egg","rice"]),wordsB:sh(["hat","shirt","sock","shoe"])},
+  {categoryA:"Hot 🔥",categoryB:"Cold ❄️",wordsA:sh(["fire","sun","soup","oven"]),wordsB:sh(["ice","snow","milk","frost"])},
+  {categoryA:"Big 🐘",categoryB:"Small 🐜",wordsA:sh(["whale","truck","house","tree"]),wordsB:sh(["ant","pea","bug","key"])},
+  {categoryA:"Fast 🏃",categoryB:"Slow 🐢",wordsA:sh(["jet","car","horse","deer"]),wordsB:sh(["turtle","snail","slug","worm"])},
+  {categoryA:"Soft 🧸",categoryB:"Hard 🪨",wordsA:sh(["pillow","teddy","sock","bed"]),wordsB:sh(["rock","brick","nut","bone"])},
+  {categoryA:"Land Animals 🦁",categoryB:"Water Animals 🐠",wordsA:sh(["dog","cow","cat","pig"]),wordsB:sh(["fish","shark","whale","crab"])},
+  {categoryA:"Fruits 🍓",categoryB:"Vegetables 🥕",wordsA:sh(["apple","grape","pear","plum"]),wordsB:sh(["carrot","bean","corn","pea"])},
+  {categoryA:"Day 🌞",categoryB:"Night 🌙",wordsA:sh(["sun","wake","play","lunch"]),wordsB:sh(["moon","sleep","star","dream"])},
+  {categoryA:"Wet 💧",categoryB:"Dry 🌵",wordsA:sh(["rain","pool","lake","bath"]),wordsB:sh(["sand","towel","dust","desert"])},
+  {categoryA:"Toys 🧸",categoryB:"Food 🍎",wordsA:sh(["ball","doll","kite","blocks"]),wordsB:sh(["apple","bread","milk","egg"])},
+  {categoryA:"Loud 📢",categoryB:"Quiet 🤫",wordsA:sh(["drum","horn","bell","shout"]),wordsB:sh(["whisper","nap","mouse","hush"])}
  ],
  level3:[
-  {categoryA:"Figurative language 📖",categoryB:"Literal language 📰",wordsA:sh(["metaphor","simile","hyperbole","idiom"]),wordsB:sh(["fact","report","definition","description"])},
-  {categoryA:"Prime numbers 🔢",categoryB:"Composite numbers 🔢",wordsA:sh(["2","3","5","7"]),wordsB:sh(["4","6","8","9"])},
-  {categoryA:"Prefixes 🔤",categoryB:"Suffixes 🔤",wordsA:sh(["un-","re-","pre-","dis-"]),wordsB:sh(["-tion","-ness","-ful","-less"])},
-  {categoryA:"Producers 🌿",categoryB:"Consumers 🦁",wordsA:sh(["oak tree","grass","seaweed","rose bush"]),wordsB:sh(["lion","rabbit","eagle","wolf"])},
-  {categoryA:"Multiplication facts × 2 ✖️",categoryB:"Multiplication facts × 5 ✖️",wordsA:sh(["2×3=6","2×4=8","2×7=14","2×9=18"]),wordsB:sh(["5×3=15","5×4=20","5×6=30","5×8=40"])},
-  {categoryA:"Types of sentences 📝",categoryB:"Parts of speech 🔤",wordsA:sh(["declarative","interrogative","exclamatory","imperative"]),wordsB:sh(["noun","verb","adjective","adverb"])},
-  {categoryA:"Biomes 🌍",categoryB:"Ecosystems 🌱",wordsA:sh(["desert","tundra","rainforest","savanna"]),wordsB:sh(["pond","coral reef","meadow","wetland"])},
-  {categoryA:"Igneous rocks 🌋",categoryB:"Sedimentary rocks 🪨",wordsA:sh(["granite","basalt","obsidian","pumice"]),wordsB:sh(["limestone","sandstone","shale","chalk"])},
-  {categoryA:"Mitosis results 🔬",categoryB:"Photosynthesis needs ☀️",wordsA:sh(["2 identical cells","cell growth","repair","reproduction"]),wordsB:sh(["sunlight","water","CO2","chlorophyll"])},
-  {categoryA:"Literary devices 📚",categoryB:"Grammar terms 📝",wordsA:sh(["alliteration","metaphor","onomatopoeia","personification"]),wordsB:sh(["clause","conjunction","participle","infinitive"])},
-  {categoryA:"Angles less than 90° 📐",categoryB:"Angles greater than 90° 📐",wordsA:sh(["30°","45°","60°","85°"]),wordsB:sh(["100°","135°","150°","170°"])},
-  {categoryA:"Expository writing 📰",categoryB:"Narrative writing 📖",wordsA:sh(["report","essay","article","manual"]),wordsB:sh(["story","memoir","legend","fable"])},
-  {categoryA:"Science tools 🔬",categoryB:"Math tools 📐",wordsA:sh(["microscope","beaker","thermometer","magnet"]),wordsB:sh(["protractor","compass","abacus","calculator"])},
-  {categoryA:"Vertebrate classes 🐾",categoryB:"Invertebrate groups 🪱",wordsA:sh(["mammal","reptile","amphibian","fish"]),wordsB:sh(["insect","mollusk","arachnid","crustacean"])},
-  {categoryA:"Water cycle stages 💧",categoryB:"Rock cycle stages 🪨",wordsA:sh(["evaporation","condensation","precipitation","runoff"]),wordsB:sh(["melting","cooling","weathering","deposition"])},
-  {categoryA:"Factors of 12 🔢",categoryB:"Factors of 15 🔢",wordsA:sh(["1","2","3","4"]),wordsB:sh(["5","15","3","1"])},
-  {categoryA:"Synonyms for big 📏",categoryB:"Synonyms for small 🐜",wordsA:sh(["enormous","gigantic","massive","colossal"]),wordsB:sh(["tiny","minuscule","petite","minute"])},
-  {categoryA:"Endothermic reactions 🧪",categoryB:"Exothermic reactions 🔥",wordsA:sh(["melting ice","photosynthesis","cooking food","dissolving"]),wordsB:sh(["burning wood","rusting","explosions","digestion"])},
-  {categoryA:"Logical reasoning 🧠",categoryB:"Creative thinking 💡",wordsA:sh(["deduction","inference","analysis","evidence"]),wordsB:sh(["brainstorm","imagine","innovate","design"])},
-  {categoryA:"Push forces ➡️",categoryB:"Pull forces ⬅️",wordsA:sh(["kicking a ball","pushing a door","hitting a nail","throwing"]),wordsB:sh(["gravity","magnetism","pulling a rope","fishing"])},
+  {categoryA:"Living 🌱",categoryB:"Non-living 🪨",wordsA:sh(["dog","tree","fish","baby"]),wordsB:sh(["rock","car","cup","chair"])},
+  {categoryA:"Things that Fly ✈️",categoryB:"Things that Swim 🏊",wordsA:sh(["bird","plane","bee","kite"]),wordsB:sh(["fish","duck","shark","frog"])},
+  {categoryA:"Letters 🔤",categoryB:"Numbers 🔢",wordsA:sh(["A","B","C","D"]),wordsB:sh(["1","2","3","4"])},
+  {categoryA:"Summer ☀️",categoryB:"Winter ❄️",wordsA:sh(["swim","beach","sun","fan"]),wordsB:sh(["snow","coat","ski","scarf"])},
+  {categoryA:"Farm Animals 🐄",categoryB:"Zoo Animals 🦓",wordsA:sh(["cow","pig","hen","goat"]),wordsB:sh(["lion","zebra","bear","seal"])},
+  {categoryA:"Has Wheels 🚗",categoryB:"Has Wings 🦋",wordsA:sh(["car","bus","bike","truck"]),wordsB:sh(["bird","bee","plane","bat"])},
+  {categoryA:"Morning ☀️",categoryB:"Bedtime 🌙",wordsA:sh(["wake","breakfast","brush","dress"]),wordsB:sh(["pajamas","sleep","dark","dream"])},
+  {categoryA:"Sweet 🍬",categoryB:"Salty 🧂",wordsA:sh(["candy","cake","honey","jam"]),wordsB:sh(["chips","pretzel","fries","salt"])},
+  {categoryA:"At School 📚",categoryB:"At the Park 🛝",wordsA:sh(["desk","book","pencil","glue"]),wordsB:sh(["slide","swing","grass","sand"])},
+  {categoryA:"Real 🌍",categoryB:"Pretend 🦄",wordsA:sh(["dog","tree","car","rock"]),wordsB:sh(["dragon","fairy","unicorn","wizard"])},
+  {categoryA:"Birds 🐦",categoryB:"Fish 🐠",wordsA:sh(["robin","owl","duck","crow"]),wordsB:sh(["shark","tuna","carp","bass"])},
+  {categoryA:"Things you Drink 🥤",categoryB:"Things you Eat 🍕",wordsA:sh(["milk","water","juice","tea"]),wordsB:sh(["pizza","apple","bread","cake"])},
+  {categoryA:"Up ⬆️",categoryB:"Down ⬇️",wordsA:sh(["sky","top","fly","jump"]),wordsB:sh(["floor","dig","fall","low"])},
+  {categoryA:"Plants 🌿",categoryB:"Animals 🐾",wordsA:sh(["tree","rose","grass","corn"]),wordsB:sh(["dog","fish","bird","ant"])}
  ],
  level4:[
-  {categoryA:"Figurative language 📖",categoryB:"Literal language 📰",wordsA:sh(["metaphor","simile","hyperbole","idiom"]),wordsB:sh(["fact","report","definition","description"])},
-  {categoryA:"Prime numbers 🔢",categoryB:"Composite numbers 🔢",wordsA:sh(["2","3","5","7"]),wordsB:sh(["4","6","8","9"])},
-  {categoryA:"Prefixes 🔤",categoryB:"Suffixes 🔤",wordsA:sh(["un-","re-","pre-","dis-"]),wordsB:sh(["-tion","-ness","-ful","-less"])},
-  {categoryA:"Producers 🌿",categoryB:"Consumers 🦁",wordsA:sh(["oak tree","grass","seaweed","rose bush"]),wordsB:sh(["lion","rabbit","eagle","wolf"])},
-  {categoryA:"Multiplication facts × 2 ✖️",categoryB:"Multiplication facts × 5 ✖️",wordsA:sh(["2×3=6","2×4=8","2×7=14","2×9=18"]),wordsB:sh(["5×3=15","5×4=20","5×6=30","5×8=40"])},
-  {categoryA:"Types of sentences 📝",categoryB:"Parts of speech 🔤",wordsA:sh(["declarative","interrogative","exclamatory","imperative"]),wordsB:sh(["noun","verb","adjective","adverb"])},
-  {categoryA:"Biomes 🌍",categoryB:"Ecosystems 🌱",wordsA:sh(["desert","tundra","rainforest","savanna"]),wordsB:sh(["pond","coral reef","meadow","wetland"])},
-  {categoryA:"Igneous rocks 🌋",categoryB:"Sedimentary rocks 🪨",wordsA:sh(["granite","basalt","obsidian","pumice"]),wordsB:sh(["limestone","sandstone","shale","chalk"])},
-  {categoryA:"Mitosis results 🔬",categoryB:"Photosynthesis needs ☀️",wordsA:sh(["2 identical cells","cell growth","repair","reproduction"]),wordsB:sh(["sunlight","water","CO2","chlorophyll"])},
-  {categoryA:"Literary devices 📚",categoryB:"Grammar terms 📝",wordsA:sh(["alliteration","metaphor","onomatopoeia","personification"]),wordsB:sh(["clause","conjunction","participle","infinitive"])},
-  {categoryA:"Angles less than 90° 📐",categoryB:"Angles greater than 90° 📐",wordsA:sh(["30°","45°","60°","85°"]),wordsB:sh(["100°","135°","150°","170°"])},
-  {categoryA:"Expository writing 📰",categoryB:"Narrative writing 📖",wordsA:sh(["report","essay","article","manual"]),wordsB:sh(["story","memoir","legend","fable"])},
-  {categoryA:"Science tools 🔬",categoryB:"Math tools 📐",wordsA:sh(["microscope","beaker","thermometer","magnet"]),wordsB:sh(["protractor","compass","abacus","calculator"])},
-  {categoryA:"Vertebrate classes 🐾",categoryB:"Invertebrate groups 🪱",wordsA:sh(["mammal","reptile","amphibian","fish"]),wordsB:sh(["insect","mollusk","arachnid","crustacean"])},
-  {categoryA:"Water cycle stages 💧",categoryB:"Rock cycle stages 🪨",wordsA:sh(["evaporation","condensation","precipitation","runoff"]),wordsB:sh(["melting","cooling","weathering","deposition"])},
-  {categoryA:"Factors of 12 🔢",categoryB:"Factors of 15 🔢",wordsA:sh(["1","2","3","4"]),wordsB:sh(["5","15","3","1"])},
-  {categoryA:"Synonyms for big 📏",categoryB:"Synonyms for small 🐜",wordsA:sh(["enormous","gigantic","massive","colossal"]),wordsB:sh(["tiny","minuscule","petite","minute"])},
-  {categoryA:"Endothermic reactions 🧪",categoryB:"Exothermic reactions 🔥",wordsA:sh(["melting ice","photosynthesis","cooking food","dissolving"]),wordsB:sh(["burning wood","rusting","explosions","digestion"])},
-  {categoryA:"Logical reasoning 🧠",categoryB:"Creative thinking 💡",wordsA:sh(["deduction","inference","analysis","evidence"]),wordsB:sh(["brainstorm","imagine","innovate","design"])},
-  {categoryA:"Push forces ➡️",categoryB:"Pull forces ⬅️",wordsA:sh(["kicking a ball","pushing a door","hitting a nail","throwing"]),wordsB:sh(["gravity","magnetism","pulling a rope","fishing"])},
+  {categoryA:"Even Numbers 2️⃣",categoryB:"Odd Numbers 1️⃣",wordsA:sh(["2","4","6","8"]),wordsB:sh(["1","3","5","7"])},
+  {categoryA:"Living Things 🌱",categoryB:"Non-living Things 🪨",wordsA:sh(["cat","plant","bird","fish"]),wordsB:sh(["rock","toy","cup","book"])},
+  {categoryA:"Vowels 🅰️",categoryB:"Other Letters 🔡",wordsA:sh(["a","e","i","o"]),wordsB:sh(["b","c","d","f"])},
+  {categoryA:"Has Fur 🐻",categoryB:"Has Feathers 🐦",wordsA:sh(["bear","dog","cat","fox"]),wordsB:sh(["owl","duck","hen","robin"])},
+  {categoryA:"Float 🛟",categoryB:"Sink ⚓",wordsA:sh(["boat","duck","cork","leaf"]),wordsB:sh(["rock","coin","key","spoon"])},
+  {categoryA:"In Water 🌊",categoryB:"In the Sky ☁️",wordsA:sh(["fish","boat","crab","shark"]),wordsB:sh(["bird","cloud","sun","plane"])},
+  {categoryA:"Plants 🌿",categoryB:"Animals 🐾",wordsA:sh(["tree","rose","grass","corn"]),wordsB:sh(["dog","fish","bird","ant"])},
+  {categoryA:"You Read 📖",categoryB:"You Write With ✏️",wordsA:sh(["book","sign","note","menu"]),wordsB:sh(["pen","pencil","crayon","chalk"])},
+  {categoryA:"Has Corners 📐",categoryB:"Round ⭕",wordsA:sh(["square","box","star","kite"]),wordsB:sh(["circle","ball","sun","coin"])},
+  {categoryA:"Grows 🌱",categoryB:"Does Not Grow 🪨",wordsA:sh(["plant","baby","puppy","tree"]),wordsB:sh(["rock","toy","chair","cup"])},
+  {categoryA:"Money 💰",categoryB:"Not Money 🚫",wordsA:sh(["coin","dollar","penny","dime"]),wordsB:sh(["leaf","rock","toy","sock"])},
+  {categoryA:"Tools 🔧",categoryB:"Toys 🧸",wordsA:sh(["hammer","saw","nail","drill"]),wordsB:sh(["ball","doll","kite","blocks"])},
+  {categoryA:"Hot 🔥",categoryB:"Cold 🧊",wordsA:sh(["fire","sun","soup","oven"]),wordsB:sh(["ice","snow","fridge","frost"])},
+  {categoryA:"Wild Animals 🦁",categoryB:"Pets 🐶",wordsA:sh(["lion","tiger","wolf","bear"]),wordsB:sh(["dog","cat","fish","hamster"])}
  ]
 };
 // SIGHT WORDS
@@ -1940,7 +1959,9 @@ function pictureGraphs(lv){
     const topic=topics[ri(0,topics.length-1)];
     const cats=topic.cats.slice(0,lv<=2?3:4);
     const maxVal=lv===1?5:lv===2?8:10;
-    const data=cats.map(c=>({label:c,val:ri(1,maxVal)}));
+    const _pool=[];for(let _v=1;_v<=maxVal;_v++)_pool.push(_v);
+    const _vals=sh(_pool).slice(0,cats.length);
+    const data=cats.map((c,_i)=>({label:c,val:_vals[_i]}));
     const sorted=[...data].sort((a,b)=>b.val-a.val);
     const qtype=['most','least','count','diff'][lv<=2?ri(0,1):ri(0,3)];
     let question,answer,choices;
@@ -1973,6 +1994,27 @@ function scienceGame(lv){
   }));
 }
 
+
+function mathStory(lv){
+  const names=['Sam','Mia','Ben','Ava','Leo','Zoe','Max','Lily'];
+  const items=[['apple','🍎'],['cookie','🍪'],['star','⭐'],['balloon','🎈'],['grape','🍇'],['flower','🌸'],['car','🚗'],['ball','⚽']];
+  const max=lv===1?6:lv===2?10:lv===3?20:50;
+  const out=[];
+  for(let q=0;q<30;q++){
+    const nm=names[ri(0,names.length-1)];
+    const it=items[ri(0,items.length-1)];
+    const add=Math.random()<0.5;
+    let a,b,ans,question;
+    if(add){ a=ri(1,max); b=ri(1,max); ans=a+b; question=nm+' has '+a+' '+it[0]+(a>1?'s':'')+'. '+nm+' gets '+b+' more. How many now?'; }
+    else { a=ri(2,max); b=ri(1,a-1); ans=a-b; question=nm+' has '+a+' '+it[0]+'s. '+nm+' gives away '+b+'. How many are left?'; }
+    const set=new Set([ans]); let g=0;
+    while(set.size<4 && g++<100){ const d=ans+ri(-3,3); if(d>=0 && d!==ans) set.add(d); }
+    let pad=1; while(set.size<4){ set.add(ans+pad); pad++; }
+    out.push({question:question, answer:String(ans), choices:sh([...set]).map(String), emoji:it[1]});
+  }
+  return out;
+}
+function rMathStory(el,rounds,lv,done){let i=0,sc=0,ch=null;function show(){if(i>=rounds.length)return;if(ch===null)_advance=null;const r=rounds[i];const rv=ch!==null;const ok=rv&&String((r.choices||[])[ch])===String(r.answer);el.innerHTML=`${pb(i,rounds.length,sc)}<div class="card">${ms(i===0&&!rv?'greet':rv?(ok?'correct':'wrong'):'idle','mathpop')}${lbl("🧮","MATH STORIES","#FF8C00")}<div style="text-align:center;margin-bottom:6px;"><span style="font-size:40px;">${r.emoji||'🧮'}</span></div><div style="font-family:'Nunito',sans-serif;font-weight:700;font-size:17px;color:#1A0A3E;text-align:center;line-height:1.45;margin-bottom:12px;background:#FFF6E9;border-radius:14px;padding:14px;">${r.question}</div><div class="g2">${(r.choices||[]).map((c,ci)=>{const isC=String(c)===String(r.answer);const tp=ch===ci;let bg="rgba(255,140,0,.08)",bo="2px solid rgba(255,140,0,.25)",tc="#1A0A3E";if(rv&&isC){bg="#E8FFF4";bo="2px solid #00D68F";tc="#00A86B";}else if(tp&&!isC){bg="#FFF0F2";bo="2px solid #FF4757";tc="#CC2F3E";}return `<button class="msq" data-ci="${ci}" style="background:${bg};border:${bo};border-radius:14px;padding:16px 8px;font-family:'Bangers','Arial Black',sans-serif;font-size:28px;color:${tc};letter-spacing:1px;cursor:${rv?"default":"pointer"};animation:${rv&&isC?"pop .35s ease":"none"};">${rv&&isC?"✅ ":tp&&!isC?"❌ ":""}${c}</button>`;}).join("")}</div>${rv?fb(ok,r.answer):""}${maybeNextBtn(i,rounds.length)}</div>`;if(!rv)pendingTap(el,".msq",()=>ch!==null,(ci,b)=>{ch=parseInt(ci);const ok2=String(rounds[i].choices[ch])===String(rounds[i].answer);ok2?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok2?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||10;if(ns>=thr||i+1>=rounds.length)done(ns,Math.min(i+1,rounds.length));else{sc=ns;i++;ch=null;show();}};const _adv=_advance;show();setTimeout(()=>{if(_adv)_adv();},800);});}show();}
 
 // TELLING TIME - procedural
 function tellingTime(lv){
@@ -2048,10 +2090,11 @@ const GAMES=[
  {id:"tellingtime",label:"Telling Time",emoji:"🕐",color:"#FFD93D",grad:"linear-gradient(135deg,#FFD93D,#F5A623)",std:"CCSS.MATH.1.MD.B3"},
  {id:"money",label:"Count Money",emoji:"💰",color:"#00D68F",grad:"linear-gradient(135deg,#00D68F,#00A86B)",std:"CCSS.MATH.2.MD.C8"},
   {id:"science",label:"Science!",emoji:"🔬",color:"#00A8FF",grad:"linear-gradient(135deg,#00A8FF,#0077CC)",std:"NGSS.K-2"},
+ {id:"mathstory",label:"Math Stories",emoji:"🧮",color:"#FF8C00",grad:"linear-gradient(135deg,#FFB347,#FF8C00)",std:"CCSS.MATH.2.OA"},
 ];
 
 function loadGame(id,lv){
- const m={flashcards:flashCards,mathflash:flashCardsMath,mathpop:mathPop,truefalseread:trueFalseRead,truefalsemath:trueFalseMath,fillblank:fillBlank,match:matchPairs,unscramble:unscramble,truefalse:trueFalse,wordpicture:wordPicture,numorder:numOrder,rhymetime:rhymeTime,wordfamily:wordFamily,greaterless:greaterLess,oddoneout:oddOneOut,counting:counting,catsort:catSort,placevalue:placeValue,skipcounting:skipCounting,sightwords:sightWords,sentbuild:sentBuild,compound:compound,tellingtime:tellingTime,money:countMoney,science:scienceGame,numberbonds:numberBonds,ordinal:ordinalNumbers,shapes:shapesPatterns,length:lengthComparison,picgraph:pictureGraphs};
+ const m={flashcards:flashCards,mathflash:flashCardsMath,mathpop:mathPop,truefalseread:trueFalseRead,truefalsemath:trueFalseMath,fillblank:fillBlank,match:matchPairs,unscramble:unscramble,truefalse:trueFalse,wordpicture:wordPicture,numorder:numOrder,rhymetime:rhymeTime,wordfamily:wordFamily,greaterless:greaterLess,oddoneout:oddOneOut,counting:counting,catsort:catSort,placevalue:placeValue,skipcounting:skipCounting,sightwords:sightWords,sentbuild:sentBuild,compound:compound,tellingtime:tellingTime,money:countMoney,science:scienceGame,mathstory:mathStory,numberbonds:numberBonds,ordinal:ordinalNumbers,shapes:shapesPatterns,length:lengthComparison,picgraph:pictureGraphs};
  return Promise.resolve(m[id](lv));
 }
 
@@ -2092,6 +2135,7 @@ const GAME_META={
   tellingtime:{emoji:"🕐",label:"Telling Time",color:"#FF6B9D"},
   money:{emoji:"💰",label:"Count Money",color:"#FFD93D"},
   science:{emoji:"🔬",label:"Science!",color:"#00B894"},
+  mathstory:{emoji:"🧮",label:"Math Stories",color:"#FF8C00"},
   numberbonds:{emoji:"🔗",label:"Number Bonds",color:"#6C3FC8"},
   ordinal:{emoji:"🥇",label:"Ordinal Numbers",color:"#FF8C00"},
   shapes:{emoji:"🔷",label:"Shapes & Patterns",color:"#FF6B9D"},
@@ -2198,7 +2242,7 @@ function renderArcade(){
 }
 
 function allGamesComplete(){
-  const all=["flashcards","sightwords","rhymetime","fillblank","wordfamily","unscramble","wordpicture","compound","sentbuild","oddoneout","catsort","truefalseread","mathflash","counting","greaterless","mathpop","skipcounting","numorder","placevalue","tellingtime","money","truefalsemath","science"];
+  const all=["flashcards","sightwords","rhymetime","fillblank","wordfamily","unscramble","wordpicture","compound","sentbuild","oddoneout","catsort","truefalseread","mathflash","counting","greaterless","mathpop","skipcounting","placevalue","tellingtime","money","truefalsemath","science"];
   const done=S.completedGames||{};
   return all.every(g=>done[g]);
 }
@@ -2262,7 +2306,7 @@ function renderLevel(){
 
 
 // ═══════════════════ MYSTERY BOX ALGEBRA ═══════════════════
-const MATH_GAMES = ['mathpop','counting','greaterless','skipcounting','numorder','placevalue','tellingtime','money','science','numberbonds','ordinal','shapes','length','picgraph'];
+const MATH_GAMES = ['mathpop','counting','greaterless','skipcounting','placevalue','tellingtime','money','mathstory','numberbonds','ordinal','shapes','length','picgraph'];
 
 function genMysteryBox(lv){
   const ops = lv <= 2 ? ['+','-'] : ['+','-','+','-']; // weight equal
@@ -2403,7 +2447,7 @@ function renderPlaying(app){
     goResults();
   }
 };
- const runners={flashcards:rFlash,mathpop:rPop,mathflash:rFlash,fillblank:rFill,match:rMatch,unscramble:rScram,truefalse:rTF,truefalseread:rTF,truefalsemath:rTF,wordpicture:rWP,numorder:rNO,rhymetime:rRhyme,wordfamily:rWF,greaterless:rGL,oddoneout:rOdd,counting:rCount,catsort:rCat,placevalue:rPV,skipcounting:rSC,sightwords:rSW,sentbuild:rSB,compound:rCW,tellingtime:rTT,money:rMoney,science:rScience,numberbonds:rNB,ordinal:rOrd,shapes:rShapes,length:rLen,picgraph:rPG};
+ const runners={flashcards:rFlash,mathpop:rPop,mathflash:rFlash,fillblank:rFill,match:rMatch,unscramble:rScram,truefalse:rTF,truefalseread:rTF,truefalsemath:rTF,wordpicture:rWP,numorder:rNO,rhymetime:rRhyme,wordfamily:rWF,greaterless:rGL,oddoneout:rOdd,counting:rCount,catsort:rCat,placevalue:rPV,skipcounting:rSC,sightwords:rSW,sentbuild:rSB,compound:rCW,tellingtime:rTT,money:rMoney,science:rScience,mathstory:rMathStory,numberbonds:rNB,ordinal:rOrd,shapes:rShapes,length:rLen,picgraph:rPG};
  loadGame(S.gameId,S.level).then(data=>runners[S.gameId](area,data,S.level,done));
 }
 
@@ -2495,8 +2539,33 @@ function autoNext(ok, delay, advanceFn, retryFn){
 // ═══════════════════ GAME RUNNERS ═══════════════════
 
 // G1 Flash Cards
-function rFlash(el,cards,lv,done){let i=0,sc=0,ch=null;function show(){if(i>=cards.length)return;if(ch===null)_advance=null;const c=cards[i];const col=c.type==="math"?"#00A8FF":"#FF6B9D";el.innerHTML=`${pb(i,cards.length,sc)}${ms(i===0&&ch===null?"greet":ch===null?"idle":String((c.choices||[])[ch]).toLowerCase()===String(c.answer).toLowerCase()?"correct":"wrong",'flashcards')}<div class="card" style="border-top:5px solid ${col};"><div style="position:absolute;top:14px;left:14px;background:${c.type==="math"?"linear-gradient(135deg,#00A8FF,#0077CC)":"linear-gradient(135deg,#FF6B9D,#E040A0)"};color:white;border-radius:10px;padding:3px 10px;font-family:'Bangers','Arial Black',sans-serif;font-size:13px;letter-spacing:1px;">${c.type==="math"?"🔢 MATH":"📖 READING"}</div>${c.visual?`<div style="font-size:42px;text-align:center;margin-top:8px;">${c.visual}</div>`:c.type==="reading"?`<div style="font-family:'Bangers','Arial Black',sans-serif;font-size:${c.answer.length>8?"36px":c.answer.length>5?"48px":"58px"};text-align:center;margin:10px 0;color:#1A0A3E;letter-spacing:3px;background:linear-gradient(135deg,#FFF3E0,#FFE0B2);border-radius:16px;padding:10px 20px;">${c.answer}</div>`:""}<div style="font-size:22px;font-family:'Nunito',sans-serif;font-weight:800;color:#1A0A3E;text-align:center;margin-top:${c.visual?"8":"28"}px;line-height:1.4;">${c.question}</div><div class="g2" style="margin-top:14px;">${ab(c.choices||[],c.answer,ch)}</div>${ch!==null?fb(String((c.choices||[])[ch]).toLowerCase()===String(c.answer).toLowerCase(),c.answer):""}</div>
-${maybeNextBtn(i,cards.length)}`;if(ch===null)bmc(el,ch,(ci,b)=>{ch=ci;const ok=String(cards[i].choices[ci]).toLowerCase()===String(cards[i].answer).toLowerCase();ok?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||10;if(ns>=thr||i+1>=cards.length)done(ns,Math.min(i+1,cards.length));else{sc=ns;i++;ch=null;show();}};const _adv=_advance;show();setTimeout(()=>{if(_adv)_adv();},800);});}show();}
+let _ttsVoice=null;
+function pickVoice(){
+  try{
+    if(typeof window==='undefined'||!('speechSynthesis' in window))return;
+    const vs=window.speechSynthesis.getVoices()||[]; if(!vs.length)return;
+    const en=vs.filter(v=>/^en/i.test(v.lang||'')); const pool=en.length?en:vs;
+    let best=null,bestScore=-999;
+    pool.forEach(v=>{ const n=(v.name||'').toLowerCase(); let sc=0;
+      if(n.includes('google')) sc+=10;
+      if(/natural|neural|enhanced|premium/.test(n)) sc+=12;
+      if(/female|woman|girl|samantha|karen|moira|tessa|victoria|fiona|serena|allison|\bava\b|susan|salli|kimberly|joanna|zira|aria|jenny|sonia|libby/.test(n)) sc+=8;
+      if(/\b(david|mark|alex|fred|daniel|james|george|guy|male|man)\b/.test(n)) sc-=8;
+      if(/en[-_]us/i.test(v.lang||'')) sc+=3; else if(/en[-_]gb/i.test(v.lang||'')) sc+=1;
+      if(v.localService) sc+=1;
+      if(sc>bestScore){bestScore=sc;best=v;}
+    });
+    _ttsVoice=best||pool[0];
+  }catch(e){}
+}
+function speakWord(w){ try{ if(typeof window==='undefined'||!('speechSynthesis' in window))return;
+  if(!_ttsVoice)pickVoice(); window.speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(String(w)); u.rate=0.8; u.pitch=1.1;
+  if(_ttsVoice){u.voice=_ttsVoice; u.lang=_ttsVoice.lang||'en-US';} else { u.lang='en-US'; }
+  window.speechSynthesis.speak(u); }catch(e){} }
+try{ if(typeof window!=='undefined' && 'speechSynthesis' in window){ window.speechSynthesis.onvoiceschanged=pickVoice; pickVoice(); } }catch(e){}
+function rFlash(el,cards,lv,done){let i=0,sc=0,ch=null;function show(){if(i>=cards.length)return;if(ch===null)_advance=null;const c=cards[i];const col=c.type==="math"?"#00A8FF":"#FF6B9D";el.innerHTML=`${pb(i,cards.length,sc)}${ms(i===0&&ch===null?"greet":ch===null?"idle":String((c.choices||[])[ch]).toLowerCase()===String(c.answer).toLowerCase()?"correct":"wrong",'flashcards')}<div class="card" style="border-top:5px solid ${col};"><div style="position:absolute;top:14px;left:14px;background:${c.type==="math"?"linear-gradient(135deg,#00A8FF,#0077CC)":"linear-gradient(135deg,#FF6B9D,#E040A0)"};color:white;border-radius:10px;padding:3px 10px;font-family:'Bangers','Arial Black',sans-serif;font-size:13px;letter-spacing:1px;">${c.type==="math"?"🔢 MATH":"📖 READING"}</div>${c.audio?`<div style="text-align:center;margin:12px 0;"><button onclick="speakWord('${c.answer}')" style="font-size:58px;background:linear-gradient(135deg,#FFD93D,#FFB400);border:none;border-radius:24px;padding:14px 32px;cursor:pointer;box-shadow:0 6px 16px rgba(255,180,0,.45);">🔊</button><div style="font-family:'Nunito',sans-serif;font-size:14px;color:#7A6FA0;margin-top:10px;font-weight:800;">Tap to hear it again</div></div>`:c.visual?`<div style="font-size:78px;text-align:center;margin:6px 0 2px;">${c.visual}</div>`:c.type==="reading"?`<div style="font-family:'Bangers','Arial Black',sans-serif;font-size:${c.answer.length>8?"36px":c.answer.length>5?"48px":"58px"};text-align:center;margin:10px 0;color:#1A0A3E;letter-spacing:3px;background:linear-gradient(135deg,#FFF3E0,#FFE0B2);border-radius:16px;padding:10px 20px;">${c.answer}</div>`:""}<div style="font-size:22px;font-family:'Nunito',sans-serif;font-weight:800;color:#1A0A3E;text-align:center;margin-top:${c.visual?"8":"28"}px;line-height:1.4;">${c.question}</div><div class="g2" style="margin-top:14px;">${ab(c.choices||[],c.answer,ch)}</div>${ch!==null?fb(String((c.choices||[])[ch]).toLowerCase()===String(c.answer).toLowerCase(),c.answer):""}</div>
+${maybeNextBtn(i,cards.length)}`;if(c.audio&&ch===null){speakWord(c.answer);}if(ch===null)bmc(el,ch,(ci,b)=>{ch=ci;const ok=String(cards[i].choices[ci]).toLowerCase()===String(cards[i].answer).toLowerCase();ok?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||10;if(ns>=thr||i+1>=cards.length)done(ns,Math.min(i+1,cards.length));else{sc=ns;i++;ch=null;show();}};const _adv=_advance;show();setTimeout(()=>{if(_adv)_adv();},800);});}show();}
 
 // G2 Math Pop
 function rPop(el,rounds,lv,done){let i=0,sc=0,pp=null;function show(){if(i>=rounds.length)return;_advance=null;const r=rounds[i];el.innerHTML=`${pb(i,rounds.length,sc)}<div class="card">${lbl("🫧","MATH POP","#00A8FF")}<div style="font-size:28px;font-family:'Nunito',sans-serif;font-weight:900;color:#1A0A3E;text-align:center;margin-bottom:4px;">${r.q} = ?</div><div style="font-size:13px;color:#A89CC8;text-align:center;margin-bottom:10px;">Pop the right bubble! 🫧</div><div class="g2" style="gap:12px;">${r.choices.map((c,ci)=>{const isC=String(c)===String(r.answer||r.w);const tp=pp===ci;const rv=pp!==null;let bg="#F8F7FF",bo="2px solid #E0D8F0",tc="#1A0A3E";if(rv&&isC){bg="#E8FFF4";bo="3px solid #00D68F";tc="#00A86B";}else if(tp&&!isC){bg="#FFF0F2";bo="3px solid #FF4757";tc="#CC2F3E";}return `<button class="pb2" data-ci="${ci}" style="background:${bg};border:${bo};border-radius:20px;padding:14px 8px;font-family:'Nunito',sans-serif;font-weight:900;font-size:30px;color:${tc};animation:${rv&&isC?"pop .4s ease":`bFloat ${1.2+ci*.3}s ease-in-out infinite`};">${rv&&isC?"✅":tp&&!isC?"❌":""} ${c}</button>`;}).join("")}</div>${pp!==null?maybeNextBtn(i,rounds.length):""}</div>`;if(pp===null)pendingTap(el,".pb2",()=>pp!==null,(ci,b)=>{pp=parseInt(ci);const ok=String(rounds[i].choices[pp])===String(rounds[i].answer||rounds[i].w);ok?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||10;if(ns>=thr||i+1>=rounds.length)done(ns,Math.min(i+1,rounds.length));else{sc=ns;i++;pp=null;show();}};const _adv=_advance;show();setTimeout(()=>{if(_adv)_adv();},800);});}show();}
@@ -2757,7 +2826,7 @@ function rNB(el,rounds,lv,done){let i=0,sc=0,ch=null;function show(){if(i>=round
 function rOrd(el,rounds,lv,done){let i=0,sc=0,ch=null;function show(){if(i>=rounds.length)return;if(ch===null)_advance=null;const r=rounds[i];const rv=ch!==null;const ok=rv&&r.choices[ch]===r.answer;el.innerHTML=pb(i,rounds.length,sc)+'<div class="card">'+ms(i===0&&!rv?'greet':rv?(ok?'correct':'wrong'):'idle','ordinal')+lbl('🥇','ORDINAL NUMBERS','#FF8C00')+'<div style="font-family:Nunito,sans-serif;font-weight:800;font-size:17px;color:#1A0A3E;text-align:center;margin-bottom:12px;background:#FFF8F0;border-radius:14px;padding:10px;">'+r.question+'</div><div style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-bottom:16px;padding:10px;background:#FFF8F0;border-radius:14px;">'+r.row.map((a,idx)=>'<div style="display:flex;flex-direction:column;align-items:center;gap:2px;"><div style="font-size:'+(r.type==='find'&&rv&&a===r.answer?'36':'28')+'px;">'+(a)+'</div><div style="font-family:Bangers,sans-serif;font-size:11px;color:'+(idx===r.pos-1?'#FF8C00':'#C0B0A0')+';letter-spacing:.5px;">'+['1st','2nd','3rd','4th','5th','6th','7th','8th','9th','10th'][idx]+'</div></div>').join('')+'</div><div class="g2">'+r.choices.map((c,ci)=>{const isC=c===r.answer;const tp=ch===ci;let bg='rgba(255,140,0,.08)',bo='2px solid rgba(255,140,0,.2)',tc='#1A0A3E';if(rv&&isC){bg='#E8FFF4';bo='3px solid #00D68F';tc='#00A86B';}else if(tp&&!isC){bg='#FFF0F2';bo='3px solid #FF4757';tc='#CC2F3E';}else if(rv){bg='rgba(200,200,200,.2)';bo='2px solid #ddd';tc='#999';}return '<button class="ord" data-ci="'+ci+'" style="background:'+bg+';border:'+bo+';border-radius:16px;padding:14px 8px;font-family:'+(r.type==='find'?'serif':"'Nunito',sans-serif")+';font-weight:800;font-size:'+(r.type==='find'?'32':'20')+'px;color:'+tc+';cursor:'+(rv?'default':'pointer')+';animation:'+(rv&&isC?'pop .35s ease':'none')+';">'+(rv&&isC?'✅ ':tp&&!isC?'❌ ':'')+c+'</button>';}).join('')+'</div>'+(rv?'<div style="text-align:center;margin-top:10px;animation:fadeUp .3s ease;"><div style="font-family:Bangers,sans-serif;font-size:20px;color:'+(ok?'#00D68F':'#FF4757')+';letter-spacing:1px;">'+(ok?'🎉 CORRECT!':'😅 ANSWER: '+r.answer)+'</div></div>':'')+maybeNextBtn(i,rounds.length)+'</div>';if(!rv)pendingTap(el,'.ord',()=>ch!==null,(ci,b)=>{ch=parseInt(ci);const ok=rounds[i].choices[ch]===rounds[i].answer;ok?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||10;if(ns>=thr||i+1>=rounds.length)done(ns,Math.min(i+1,rounds.length));else{sc=ns;i++;ch=null;show();}};const _adv=_advance;show();setTimeout(()=>{if(_adv)_adv();},800);});}show();}
 
 // ── Shapes & Patterns runner ──
-function rShapes(el,rounds,lv,done){let i=0,sc=0,ch=null;function show(){if(i>=rounds.length)return;if(ch===null)_advance=null;const r=rounds[i];const rv=ch!==null;const ok=rv&&r.choices[ch]===r.answer;const visual=r.type==='pattern'?'<div style="display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;background:#FFF8F0;border-radius:14px;padding:12px;">'+r.seq.map((e,idx)=>idx===r.seq.length-1?'<div style="width:52px;height:52px;border-radius:14px;background:'+(rv?(ok?'linear-gradient(135deg,#00D68F,#00A86B)':'linear-gradient(135deg,#FF4757,#CC2F3E)'):'linear-gradient(135deg,#E8E4F8,#D0C8F0)')+';display:flex;align-items:center;justify-content:center;font-size:28px;">'+(rv?r.answer:'?')+'</div>':'<div style="font-size:36px;">'+e+'</div>').join('')+'</div>':'<div style="text-align:center;font-size:72px;margin-bottom:14px;">'+r.emoji+'</div>';el.innerHTML=pb(i,rounds.length,sc)+'<div class="card">'+ms(i===0&&!rv?'greet':rv?(ok?'correct':'wrong'):'idle','shapes')+lbl('🔷','SHAPES & PATTERNS','#FF6B9D')+'<div style="font-family:Nunito,sans-serif;font-weight:800;font-size:17px;color:#1A0A3E;text-align:center;margin-bottom:10px;background:#FFF0F7;border-radius:14px;padding:10px;">'+r.question+'</div>'+visual+'<div class="g2">'+r.choices.map((c,ci)=>{const isC=c===r.answer;const tp=ch===ci;let bg='rgba(255,107,157,.08)',bo='2px solid rgba(255,107,157,.2)',tc='#1A0A3E';if(rv&&isC){bg='#E8FFF4';bo='3px solid #00D68F';tc='#00A86B';}else if(tp&&!isC){bg='#FFF0F2';bo='3px solid #FF4757';tc='#CC2F3E';}else if(rv){bg='rgba(200,200,200,.2)';bo='2px solid #ddd';tc='#999';}return '<button class="sh" data-ci="'+ci+'" style="background:'+bg+';border:'+bo+';border-radius:16px;padding:14px 8px;font-size:24px;color:'+tc+';cursor:'+(rv?'default':'pointer')+';animation:'+(rv&&isC?'pop .35s ease':'none')+';">'+(rv&&isC?'✅ ':tp&&!isC?'❌ ':'')+c+'</button>';}).join('')+'</div>'+(rv?'<div style="text-align:center;margin-top:10px;animation:fadeUp .3s ease;"><div style="font-family:Bangers,sans-serif;font-size:20px;color:'+(ok?'#00D68F':'#FF4757')+';letter-spacing:1px;">'+(ok?'🎉 CORRECT!':'😅 ANSWER: '+r.answer)+'</div></div>':'')+maybeNextBtn(i,rounds.length)+'</div>';if(!rv)pendingTap(el,'.sh',()=>ch!==null,(ci,b)=>{ch=parseInt(ci);const ok=rounds[i].choices[ch]===rounds[i].answer;ok?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||10;if(ns>=thr||i+1>=rounds.length)done(ns,Math.min(i+1,rounds.length));else{sc=ns;i++;ch=null;show();}};const _adv=_advance;show();setTimeout(()=>{if(_adv)_adv();},800);});}show();}
+function rShapes(el,rounds,lv,done){let i=0,sc=0,ch=null;function show(){if(i>=rounds.length)return;if(ch===null)_advance=null;const r=rounds[i];const rv=ch!==null;const ok=rv&&r.choices[ch]===r.answer;const visual=r.type==='pattern'?'<div style="display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;background:#FFF8F0;border-radius:14px;padding:12px;">'+r.seq.map((e,idx)=>idx===r.seq.length-1?'<div style="width:52px;height:52px;border-radius:14px;background:'+(rv?(ok?'linear-gradient(135deg,#00D68F,#00A86B)':'linear-gradient(135deg,#FF4757,#CC2F3E)'):'linear-gradient(135deg,#E8E4F8,#D0C8F0)')+';display:flex;align-items:center;justify-content:center;font-size:28px;">'+(rv?r.answer:'?')+'</div>':'<div style="font-size:36px;">'+e+'</div>').join('')+'</div>':(r.emoji==='🟥'?'<div style="width:120px;height:120px;background:#3B6BFF;border-radius:8px;margin:0 auto 14px;"></div>':r.emoji==='🟦'?'<div style="width:175px;height:105px;background:#3B6BFF;border-radius:8px;margin:0 auto 14px;"></div>':'<div style="text-align:center;font-size:72px;margin-bottom:14px;">'+r.emoji+'</div>');el.innerHTML=pb(i,rounds.length,sc)+'<div class="card">'+ms(i===0&&!rv?'greet':rv?(ok?'correct':'wrong'):'idle','shapes')+lbl('🔷','SHAPES & PATTERNS','#FF6B9D')+'<div style="font-family:Nunito,sans-serif;font-weight:800;font-size:17px;color:#1A0A3E;text-align:center;margin-bottom:10px;background:#FFF0F7;border-radius:14px;padding:10px;">'+r.question+'</div>'+visual+'<div class="g2">'+r.choices.map((c,ci)=>{const isC=c===r.answer;const tp=ch===ci;let bg='rgba(255,107,157,.08)',bo='2px solid rgba(255,107,157,.2)',tc='#1A0A3E';if(rv&&isC){bg='#E8FFF4';bo='3px solid #00D68F';tc='#00A86B';}else if(tp&&!isC){bg='#FFF0F2';bo='3px solid #FF4757';tc='#CC2F3E';}else if(rv){bg='rgba(200,200,200,.2)';bo='2px solid #ddd';tc='#999';}return '<button class="sh" data-ci="'+ci+'" style="background:'+bg+';border:'+bo+';border-radius:16px;padding:14px 8px;font-size:24px;color:'+tc+';cursor:'+(rv?'default':'pointer')+';animation:'+(rv&&isC?'pop .35s ease':'none')+';">'+(rv&&isC?'✅ ':tp&&!isC?'❌ ':'')+c+'</button>';}).join('')+'</div>'+(rv?'<div style="text-align:center;margin-top:10px;animation:fadeUp .3s ease;"><div style="font-family:Bangers,sans-serif;font-size:20px;color:'+(ok?'#00D68F':'#FF4757')+';letter-spacing:1px;">'+(ok?'🎉 CORRECT!':'😅 ANSWER: '+r.answer)+'</div></div>':'')+maybeNextBtn(i,rounds.length)+'</div>';if(!rv)pendingTap(el,'.sh',()=>ch!==null,(ci,b)=>{ch=parseInt(ci);const ok=rounds[i].choices[ch]===rounds[i].answer;ok?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||10;if(ns>=thr||i+1>=rounds.length)done(ns,Math.min(i+1,rounds.length));else{sc=ns;i++;ch=null;show();}};const _adv=_advance;show();setTimeout(()=>{if(_adv)_adv();},800);});}show();}
 
 // ── Length Comparison runner ──
 function rLen(el,rounds,lv,done){let i=0,sc=0,ch=null;function show(){if(i>=rounds.length)return;if(ch===null)_advance=null;const r=rounds[i];const rv=ch!==null;const ok=rv&&r.choices[ch]===r.answer;const maxL=Math.max(...r.items.map(it=>it.len));el.innerHTML=pb(i,rounds.length,sc)+'<div class="card">'+ms(i===0&&!rv?'greet':rv?(ok?'correct':'wrong'):'idle','length')+lbl('📏','LENGTH COMPARISON','#00A8FF')+'<div style="font-family:Nunito,sans-serif;font-weight:800;font-size:17px;color:#1A0A3E;text-align:center;margin-bottom:12px;background:#F0F8FF;border-radius:14px;padding:10px;">'+r.question+'</div><div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px;background:#F0F8FF;border-radius:14px;padding:12px;">'+r.items.map(it=>{const pct=Math.round((it.len/maxL)*100);const isAns=it.name===r.answer;return '<div style="display:flex;align-items:center;gap:8px;"><div style="font-size:24px;">'+it.emoji+'</div><div style="flex:1;height:28px;background:#E0EEF8;border-radius:8px;overflow:hidden;"><div style="height:100%;width:'+pct+'%;background:'+(rv&&isAns?'#00D68F':'linear-gradient(90deg,#00A8FF,#0077CC)')+';border-radius:8px;display:flex;align-items:center;padding-left:6px;font-size:11px;font-weight:800;color:white;">'+it.len+' cm</div></div></div>';}).join('')+'</div><div class="g2">'+r.choices.map((c,ci)=>{const isC=c===r.answer;const tp=ch===ci;let bg='rgba(0,168,255,.08)',bo='2px solid rgba(0,168,255,.2)',tc='#1A0A3E';if(rv&&isC){bg='#E8FFF4';bo='3px solid #00D68F';tc='#00A86B';}else if(tp&&!isC){bg='#FFF0F2';bo='3px solid #FF4757';tc='#CC2F3E';}else if(rv){bg='rgba(200,200,200,.2)';bo='2px solid #ddd';tc='#999';}const it=r.items.find(x=>x.name===c);return '<button class="len" data-ci="'+ci+'" style="background:'+bg+';border:'+bo+';border-radius:16px;padding:12px 8px;font-weight:800;font-size:16px;color:'+tc+';cursor:'+(rv?'default':'pointer')+';animation:'+(rv&&isC?'pop .35s ease':'none')+';display:flex;align-items:center;justify-content:center;gap:6px;">'+(it?'<span style="font-size:22px;">'+it.emoji+'</span>':'')+(rv&&isC?'✅ ':tp&&!isC?'❌ ':'')+c+'</button>';}).join('')+'</div>'+(rv?'<div style="text-align:center;margin-top:10px;animation:fadeUp .3s ease;"><div style="font-family:Bangers,sans-serif;font-size:20px;color:'+(ok?'#00D68F':'#FF4757')+';letter-spacing:1px;">'+(ok?'🎉 CORRECT!':'😅 ANSWER: '+r.answer)+'</div></div>':'')+maybeNextBtn(i,rounds.length)+'</div>';if(!rv)pendingTap(el,'.len',()=>ch!==null,(ci,b)=>{ch=parseInt(ci);const ok=rounds[i].choices[ch]===rounds[i].answer;ok?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||10;if(ns>=thr||i+1>=rounds.length)done(ns,Math.min(i+1,rounds.length));else{sc=ns;i++;ch=null;show();}};const _adv=_advance;show();setTimeout(()=>{if(_adv)_adv();},800);});}show();}
@@ -3193,7 +3262,7 @@ function startArcadeGame(id){
   const starters = {
     rocketdodge: startRocketDodge, froghop: startFrogHop, balloonpop: startBalloonPop,
     starcatcher: startStarCatcher, fishfeast: startFishFeast, coindrop: startCoinDrop,
-    beeflyer: startBeeFlyer, stackit: startStackIt, stackbounce: startStackBounce
+    beeflyer: startBeeFlyer, stackit: startStackIt, stackbounce: startStackBounce, molepop: startMolePop
   };
   (starters[id] || (()=>{}))();
 }
@@ -3372,6 +3441,28 @@ function startFrogHop(){
 
 
 // ─── 3. BALLOON POP ───
+function startMolePop(){
+  const cv=setupCanvas(); const ctx=cv.getContext('2d');
+  let score=0, missed=0, t=0, alive=true, moles=[];
+  const cols=3, rows=2, nHoles=cols*rows;
+  function holePos(idx){ const c=idx%cols, r=Math.floor(idx/cols); const gw=cv.width/(cols+1), gh=(cv.height-50)/(rows+1); return {x:gw*(c+1), y:50+gh*(r+1)}; }
+  const tap=(e)=>{ const rr=cv.getBoundingClientRect(); const x=(e.touches?e.touches[0].clientX:e.clientX)-rr.left; const y=(e.touches?e.touches[0].clientY:e.clientY)-rr.top; for(let i=moles.length-1;i>=0;i--){ const m=moles[i]; const p=holePos(m.hole); if(Math.abs(p.x-x)<44 && Math.abs(p.y-y)<44){ if(m.bad){ alive=false; } else { score++; setScore(score); } moles.splice(i,1); break; } } };
+  cv.addEventListener('pointerdown',tap);
+  _arcadeCleanup=()=>cv.removeEventListener('pointerdown',tap);
+  setMsg('Tap moles! Avoid bombs 💣 (3 escape = over)');
+  function loop(){
+    t++;
+    ctx.fillStyle='#7EC850'; ctx.fillRect(0,0,cv.width,cv.height);
+    for(let h=0;h<nHoles;h++){ const p=holePos(h); ctx.fillStyle='#4A3526'; ctx.beginPath(); ctx.ellipse(p.x,p.y+20,42,17,0,0,7); ctx.fill(); }
+    const spawnRate=Math.max(28,70-score*2);
+    if(t%spawnRate===0){ const used=moles.map(m=>m.hole); const free=[]; for(let h=0;h<nHoles;h++) if(!used.includes(h)) free.push(h); if(free.length){ const hole=free[Math.floor(Math.random()*free.length)]; moles.push({hole,life:Math.max(38,85-score*1.5),bad:Math.random()<0.16}); } }
+    ctx.textAlign='center';
+    for(let i=moles.length-1;i>=0;i--){ const m=moles[i]; const p=holePos(m.hole); m.life--; ctx.font='42px serif'; ctx.fillText(m.bad?'💣':'🐹', p.x, p.y+10); if(m.life<=0){ moles.splice(i,1); if(!m.bad){ missed++; setMsg('Escaped! '+missed+'/3'); if(missed>=3) alive=false; } } }
+    if(alive){ _arcadeLoop=requestAnimationFrame(loop); } else { arcadeGameOver('molepop',score); }
+  }
+  loop();
+}
+
 function startBalloonPop(){
   const cv=setupCanvas(); const ctx=cv.getContext('2d');
   let score=0, missed=0, t=0, alive=true, balloons=[];
@@ -3775,7 +3866,7 @@ const CATEGORIES = {
       ["flashcards","sightwords","rhymetime"],
       ["fillblank","wordfamily","unscramble"],
       ["wordpicture","compound","sentbuild"],
-      ["oddoneout","catsort","truefalseread"]
+      ["oddoneout","catsort","truefalseread","science"]
     ]
   },
   math: {
@@ -3784,10 +3875,10 @@ const CATEGORIES = {
     bg: "linear-gradient(135deg,#00D68F,#00A8FF)",
     tiers: [
       ["mathflash","counting","greaterless"],
-      ["mathpop","skipcounting","numorder"],
+      ["mathpop","skipcounting","ordinal"],
       ["placevalue","tellingtime","money"],
-      ["truefalsemath","science","numberbonds"],
-      ["ordinal","shapes","length","picgraph"]
+      ["truefalsemath","mathstory","numberbonds"],
+      ["shapes","length","picgraph"]
     ]
   }
 };
@@ -3905,6 +3996,7 @@ const ARCADE_GAMES = [
   {id:"beeflyer", emoji:"🐝", name:"Bee Flyer", desc:"Tap to keep flying!", color:"#FFC312", unlockBy:{cat:"math",tier:3}},
   {id:"stackit", emoji:"🗼", name:"Stack It", desc:"Tap to stack the treats!", color:"#00A8FF", unlockBy:{cat:"math",tier:4}},
   {id:"stackbounce", emoji:"🌀", name:"Stack Bounce", desc:"Hold to smash down the tower!", color:"#9B6FE8", unlockBy:{cat:"reading",tier:1}},
+  {id:"molepop", emoji:"🐹", name:"Mole Pop", desc:"Tap moles, dodge bombs!", color:"#7EC850", unlockBy:{cat:"math",tier:1}},
 ];
 
 function getUnlockedArcade(){
