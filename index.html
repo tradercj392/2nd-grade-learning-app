@@ -3276,7 +3276,8 @@ function startArcadeGame(id){
   const starters = {
     rocketdodge: startRocketDodge, froghop: startFrogHop, balloonpop: startBalloonPop,
     starcatcher: startStarCatcher, fishfeast: startFishFeast, coindrop: startCoinDrop,
-    beeflyer: startBeeFlyer, stackit: startStackIt, stackbounce: startStackBounce, molepop: startMolePop
+    beeflyer: startBeeFlyer, stackit: startStackIt, stackbounce: startBunnyHop, molepop: startMolePop,
+    musictiles: startMusicTiles, patterntap: startPatternTap
   };
   (starters[id] || (()=>{}))();
 }
@@ -3925,81 +3926,246 @@ function markGameCompleted(gameId, score) {
 }
 
 // ─── 9. STACK BOUNCE ───
-function startStackBounce(){
+function startBunnyHop(){
   const cv=setupCanvas(); const ctx=cv.getContext('2d');
   const W=cv.width, H=cv.height;
-  const ballScreenY=H*0.24;
-  const ballR=Math.max(15,Math.min(22,W*0.055));
-  const gap=44, N=18, layerH=22;
-  const margin=Math.max(26,W*0.14);
-  let layers=[];
-  for(let k=0;k<N;k++){
-    const gold=((k+1)%5===0);
-    layers.push({wy:ballScreenY+ballR+gap*(k+1), gold:gold, color:gold?'#FFD93D':(k%2?'#00D68F':'#00A8FF')});
-  }
-  let camY=0, vel=0, score=0, diveCount=0, alive=true, t=0;
-  let nextIdx=0, bob=0, shake=0, ballFlash=0, won=false, hintPulse=0;
-  let particles=[];
-  const smash=()=>{ if(!alive||won) return; vel=Math.max(vel,15); ballFlash=6; diveCount=0; };
-  cv.addEventListener('pointerdown',smash);
-  _arcadeCleanup=()=>{ cv.removeEventListener('pointerdown',smash); };
-  setMsg('Tap to smash down!');
-  function burst(y,color,n){ for(let i=0;i<n;i++){ const a=Math.random()*6.28, sp=2+Math.random()*5; particles.push({x:W/2+(Math.random()-0.5)*(W-margin*2), y:y, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp-2, life:1, color:color, r:3+Math.random()*5}); } }
-  function trig(layer){ return layer.wy-ballScreenY-ballR; }
+  const groundY=H*0.80;
+  const bx=W*0.24;
+  const bsz=Math.max(28,Math.min(42,W*0.11));
+  let by=groundY, vy=0, onGround=true;
+  // Floaty, forgiving jump: tall arc + gentle gravity = long hang time + wide timing window
+  const grav=Math.max(0.45,H*0.0011);
+  const jumpH=H*0.42;
+  const jumpV=-Math.sqrt(2*grav*jumpH);
+  const speed0=Math.max(2.0,W*0.0055);
+  let speed=speed0;
+  const speedCap=Math.max(3.4,W*0.010);
+  let obstacles=[], particles=[];
+  let score=0, alive=true, t=0, shake=0, sinceSpawn=0, groundScroll=0;
+  let lives=3, invuln=0;
+  const hop=()=>{ if(!alive) return; if(onGround){ vy=jumpV; onGround=false; } };
+  cv.addEventListener('pointerdown',hop);
+  _arcadeCleanup=()=>{ cv.removeEventListener('pointerdown',hop); };
+  setMsg('Tap to HOP! You have 3 hearts.'); setScore(0);
+  function burst(x,y,c,n){ for(let i=0;i<n;i++){ const ang=Math.random()*6.28, sp=1+Math.random()*4; particles.push({x:x,y:y,vx:Math.cos(ang)*sp,vy:Math.sin(ang)*sp-2,life:1,r:2+Math.random()*4,color:c}); } }
+  function rrect(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
   function step(){
-    t++; bob+=0.16; if(shake>0) shake--; if(ballFlash>0) ballFlash--; hintPulse+=0.1;
-    for(let i=particles.length-1;i>=0;i--){ const p=particles[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=0.35; p.life-=0.03; if(p.life<=0) particles.splice(i,1); }
-    if(nextIdx>=N){ if(!won){ won=true; burst(ballScreenY,'#FFD93D',50); shake=12; setTimeout(()=>{ alive=false; },900); } return; }
-    if(vel>0){
-      camY+=vel; vel*=0.9; if(vel<0.6) vel=0;
-      while(nextIdx<N && camY>=trig(layers[nextIdx])){
-        const L=layers[nextIdx];
-        score+=L.gold?3:1; setScore(score);
-        diveCount++;
-        burst(ballScreenY+ballR, L.color, L.gold?20:11);
-        shake=Math.min(9,4+diveCount); ballFlash=4;
-        nextIdx++;
-        if(nextIdx>=N){ camY=trig(layers[N-1]); vel=0; break; }
-      }
-    } else if(nextIdx<N){
-      const tgt=trig(layers[nextIdx]);
-      camY = camY<tgt ? Math.min(tgt,camY+4) : tgt;
+    t++; sinceSpawn+=speed; if(speed<speedCap) speed+=0.00022;
+    if(invuln>0) invuln--;
+    if(!onGround){ vy+=grav; by+=vy; if(by>=groundY){ by=groundY; vy=0; onGround=true; } }
+    const gap=Math.max(W*1.15, speed*120 + W*0.55);
+    if(sinceSpawn>=gap){ sinceSpawn=0; const h=bsz*(0.48+Math.random()*0.34), w=bsz*(0.62+Math.random()*0.38); obstacles.push({x:W+w, w:w, h:h, scored:false, hit:false}); }
+    for(let i=obstacles.length-1;i>=0;i--){ const o=obstacles[i]; o.x-=speed;
+      if(!o.scored && o.x+o.w<bx){ o.scored=true; score++; setScore(score); burst(bx, by-bsz*0.6, '#FFD93D', 7); }
+      if(o.x+o.w<-12) obstacles.splice(i,1); }
+    if(invuln<=0){
+      const bxl=bx-bsz*0.20, bxr=bx+bsz*0.20, feet=by;
+      for(const o of obstacles){ if(o.hit) continue; const oxl=o.x+o.w*0.18, oxr=o.x+o.w*0.82, otop=groundY-o.h+bsz*0.30;
+        if(bxr>oxl && bxl<oxr && feet>otop){
+          o.hit=true; lives--; shake=12; invuln=72; burst(bx, by-bsz*0.5, '#FF4757', 16);
+          if(lives<=0) alive=false;
+          break;
+        } }
     }
-  }
-  function drawBall(){
-    const y=ballScreenY+(vel>0?0:Math.sin(bob)*3);
-    const sm=vel>0||ballFlash>0;
-    ctx.fillStyle=sm?'rgba(255,140,0,.4)':'rgba(155,111,232,.4)'; ctx.beginPath(); ctx.arc(W/2,y,ballR*1.6,0,7); ctx.fill();
-    ctx.fillStyle=sm?'#FF7A00':'#9B6FE8'; ctx.beginPath(); ctx.arc(W/2,y,ballR,0,7); ctx.fill();
-    ctx.fillStyle=sm?'#FFD93D':'rgba(255,255,255,.6)'; ctx.beginPath(); ctx.arc(W/2-ballR*0.28,y-ballR*0.28,ballR*0.36,0,7); ctx.fill();
+    for(let i=particles.length-1;i>=0;i--){ const p=particles[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=0.3; p.life-=0.03; if(p.life<=0) particles.splice(i,1); }
+    groundScroll=(groundScroll+speed)%60;
   }
   function loop(){
     if(alive) step();
-    const grd=ctx.createLinearGradient(0,0,0,H); grd.addColorStop(0,'#2a1a5e'); grd.addColorStop(1,'#0d0824');
+    const grd=ctx.createLinearGradient(0,0,0,H); grd.addColorStop(0,'#8FD0FF'); grd.addColorStop(1,'#E4F6FF');
     ctx.fillStyle=grd; ctx.fillRect(0,0,W,H);
-    ctx.save(); if(shake>0) ctx.translate((Math.random()-0.5)*shake,(Math.random()-0.5)*shake);
-    ctx.fillStyle='rgba(255,255,255,.07)'; ctx.fillRect(W/2-6,0,12,H);
-    for(let k=nextIdx;k<N;k++){
-      const L=layers[k], sy=L.wy-camY;
-      if(sy<-layerH||sy>H+layerH) continue;
-      ctx.fillStyle=L.color; rrect(ctx,margin,sy,W-margin*2,layerH,9); ctx.fill();
-      ctx.fillStyle='rgba(255,255,255,.28)'; rrect(ctx,margin+5,sy+3,W-margin*2-10,layerH*0.38,5); ctx.fill();
-      if(L.gold){ ctx.fillStyle='rgba(255,255,255,.9)'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font='bold '+Math.round(layerH*0.7)+"px 'Arial',sans-serif"; ctx.fillText('★',W/2,sy+layerH/2); ctx.textBaseline='alphabetic'; }
-    }
-    for(let i=0;i<particles.length;i++){ const p=particles[i]; ctx.globalAlpha=Math.max(0,p.life); ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fill(); }
-    ctx.globalAlpha=1; drawBall(); ctx.restore();
-    if(vel>0 && diveCount>1){ ctx.fillStyle='#FF8C00'; ctx.textAlign='center'; ctx.font="bold 24px 'Arial Black',sans-serif"; ctx.fillText('🔥 '+diveCount, W/2, ballScreenY-ballR-16); }
-    if(vel===0 && !won && alive){ const a=0.45+0.45*Math.sin(hintPulse); ctx.globalAlpha=a; ctx.fillStyle='#FFD93D'; ctx.textAlign='center'; ctx.font="bold 20px 'Arial Black',sans-serif"; ctx.fillText('TAP!', W/2, ballScreenY-ballR-16); ctx.globalAlpha=1; }
-    ctx.fillStyle='#FFD93D'; ctx.textAlign='left'; ctx.font="bold 15px 'Arial Black',sans-serif"; ctx.fillText('🌀 '+Math.round(nextIdx/N*100)+'%',10,22);
-    if(won){ ctx.fillStyle='#FFD93D'; ctx.textAlign='center'; ctx.font="bold 32px 'Arial Black',sans-serif"; ctx.fillText('🎉 DONE!', W/2, H/2); }
+    ctx.fillStyle='rgba(255,232,130,.9)'; ctx.beginPath(); ctx.arc(W*0.82,H*0.16,Math.max(16,W*0.06),0,7); ctx.fill();
+    ctx.save(); if(shake>0){ ctx.translate((Math.random()-0.5)*shake,(Math.random()-0.5)*shake); shake--; }
+    ctx.fillStyle='#7ED957'; ctx.fillRect(0,groundY,W,H-groundY);
+    ctx.fillStyle='#5FBF3F'; ctx.fillRect(0,groundY,W,Math.max(4,H*0.012));
+    ctx.fillStyle='rgba(255,255,255,.20)';
+    for(let gx=-groundScroll; gx<W; gx+=60){ ctx.fillRect(gx, groundY+(H-groundY)*0.45, 20, 4); }
+    for(const o of obstacles){ const oy=groundY-o.h;
+      ctx.fillStyle='#9B7B58'; rrect(ctx,o.x,oy,o.w,o.h,Math.min(12,o.w*0.35)); ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.28)'; rrect(ctx,o.x+3,oy+3,Math.max(2,o.w-6),o.h*0.3,4); ctx.fill(); }
+    for(const p of particles){ ctx.globalAlpha=Math.max(0,p.life); ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fill(); }
+    ctx.globalAlpha=1;
+    const blink = invuln>0 && (Math.floor(t/4)%2===0);
+    ctx.globalAlpha = blink?0.35:1;
+    ctx.font=Math.round(bsz*1.3)+"px 'Arial',sans-serif"; ctx.textAlign='center'; ctx.textBaseline='alphabetic';
+    ctx.fillText('🐰', bx, by);
+    ctx.globalAlpha=1;
+    ctx.restore();
+    ctx.font="20px 'Arial',sans-serif"; ctx.textAlign='left'; ctx.textBaseline='top';
+    for(let i=0;i<3;i++){ ctx.globalAlpha = i<lives?1:0.25; ctx.fillText('❤️', 10+i*26, 8); }
+    ctx.globalAlpha=1; ctx.textBaseline='alphabetic';
+    if(t<140 && alive){ const al=0.5+0.4*Math.sin(t*0.18); ctx.globalAlpha=al; ctx.fillStyle='#1A0A3E'; ctx.textAlign='center'; ctx.font="bold 22px 'Arial Black',sans-serif"; ctx.fillText('TAP TO HOP!', W/2, H*0.38); ctx.globalAlpha=1; }
     if(alive){ _arcadeLoop=requestAnimationFrame(loop); }
-    else { setTimeout(()=>arcadeGameOver('stackbounce',score),300); }
+    else { setTimeout(()=>arcadeGameOver('stackbounce',score),400); }
   }
-  function rrect(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
   loop();
 }
 
 // ═══════════════════ MINI ARCADE ═══════════════════
+// ─── shared note player (Web Audio) for musical arcade games ───
+let _noteCtx=null;
+function noteCtx(){ try{ if(!_noteCtx) _noteCtx=new(window.AudioContext||window.webkitAudioContext)(); if(_noteCtx.state==='suspended'){ _noteCtx.resume(); } return _noteCtx; }catch(e){ return null; } }
+function playNote(freq,dur,type){ try{ const c=noteCtx(); if(!c) return; const o=c.createOscillator(), g=c.createGain(); o.connect(g); g.connect(c.destination); o.type=type||'triangle'; o.frequency.setValueAtTime(freq,c.currentTime); g.gain.setValueAtTime(0.0001,c.currentTime); g.gain.exponentialRampToValueAtTime(0.22,c.currentTime+0.02); g.gain.exponentialRampToValueAtTime(0.0001,c.currentTime+(dur||0.35)); o.start(c.currentTime); o.stop(c.currentTime+(dur||0.35)+0.03); }catch(e){} }
+
+// ─── MUSIC TILES ───
+function startMusicTiles(){
+  const cv=setupCanvas(); const ctx=cv.getContext('2d');
+  const W=cv.width, H=cv.height;
+  const N=7, laneW=W/N;
+  const kbH=Math.max(60,Math.round(H*0.20));
+  const lineY=H-kbH;
+  const tileW=laneW*0.74, tileH=Math.max(30,Math.round(H*0.08));
+  const restY=lineY-tileH-6;
+  const fallSpeed=Math.max(2.4,H*0.006);
+  const FREQ=[523.25,587.33,659.25,698.46,783.99,880.00,987.77];
+  const NOTE=['C','D','E','F','G','A','B'];
+  const COL=['#FF5C7A','#FF9F40','#FFD93D','#4CD964','#34C9C9','#4DA3FF','#A06CFF'];
+  const SONGS=[
+    {name:'Twinkle Twinkle', emoji:'⭐', mcolor:'#4DA3FF', notes:[0,0,4,4,5,5,4,3,3,2,2,1,1,0,4,4,3,3,2,2,1,4,4,3,3,2,2,1,0,0,4,4,5,5,4,3,3,2,2,1,1,0]},
+    {name:'Mary Had a Little Lamb', emoji:'🐑', mcolor:'#4CD964', notes:[2,1,0,1,2,2,2,1,1,1,2,4,4,2,1,0,1,2,2,2,2,1,1,2,1,0]},
+    {name:'Hot Cross Buns', emoji:'🥐', mcolor:'#FF9F40', notes:[2,1,0,2,1,0,0,0,0,0,1,1,1,1,2,1,0]},
+    {name:'Ode to Joy', emoji:'🎶', mcolor:'#A06CFF', notes:[2,2,3,4,4,3,2,1,0,0,1,2,2,1,1,2,2,3,4,4,3,2,1,0,0,1,2,1,0]}
+  ];
+  let mode='menu', songIdx=0, ni=0;
+  let score=0, t=0, alive=true;
+  let keyFlash=new Array(N).fill(0);
+  let particles=[];
+  let tileY=-tileH, resting=false;
+  let banner=0;
+  noteCtx();
+  const M=20, MTOP=Math.max(90,Math.round(H*0.17)), MGAP=14;
+  const MBTNH=Math.max(60,(H-30-MTOP-(SONGS.length-1)*MGAP)/SONGS.length);
+  function menuRect(i){ return {x:M, y:MTOP+i*(MBTNH+MGAP), w:W-2*M, h:MBTNH}; }
+  function song(){ return SONGS[songIdx]; }
+  function curNote(){ return song().notes[ni]; }
+  function rrect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+  function burst(x,y,c,n){ for(let i=0;i<n;i++){ const a=Math.random()*6.28, sp=1+Math.random()*4; particles.push({x:x,y:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2,life:1,r:2+Math.random()*4,color:c}); } }
+  function nextTile(){ tileY=-tileH; resting=false; }
+  function startSong(i){ songIdx=i; ni=0; banner=0; particles=[]; keyFlash=new Array(N).fill(0); nextTile(); mode='play'; setMsg('Press the glowing key to play!'); }
+  function toMenu(){ mode='menu'; banner=0; particles=[]; setMsg('Pick a song to play!'); }
+  function advance(){ score++; setScore(score); ni++; if(ni>=song().notes.length){ banner=120; burst(W/2,H*0.42,'#FFD93D',26); } else { nextTile(); } }
+  const tap=(e)=>{ if(!alive) return; const r=cv.getBoundingClientRect();
+    const x=((e.clientX!=null?e.clientX:(e.touches&&e.touches[0].clientX))||0)-r.left;
+    const y=((e.clientY!=null?e.clientY:(e.touches&&e.touches[0].clientY))||0)-r.top;
+    if(mode==='menu'){ for(let i=0;i<SONGS.length;i++){ const b=menuRect(i); if(x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h){ playNote(FREQ[SONGS[i].notes[0]],0.4,'triangle'); startSong(i); return; } } return; }
+    if(x>=8&&x<=104&&y>=8&&y<=40){ toMenu(); return; }
+    const lane=Math.max(0,Math.min(N-1,Math.floor(x/laneW)));
+    keyFlash[lane]=12; playNote(FREQ[lane],0.5,'triangle');
+    if(banner>0) return;
+    if(lane===curNote()){ const cx=lane*laneW+laneW/2; burst(cx, resting?restY+tileH/2:tileY+tileH/2, COL[lane], 12); advance(); }
+  };
+  cv.addEventListener('pointerdown',tap);
+  _arcadeCleanup=()=>{ cv.removeEventListener('pointerdown',tap); };
+  setMsg('Pick a song to play!'); setScore(0);
+  function step(){
+    t++;
+    for(let i=0;i<N;i++) if(keyFlash[i]>0) keyFlash[i]--;
+    for(let i=particles.length-1;i>=0;i--){ const p=particles[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=0.3; p.life-=0.03; if(p.life<=0) particles.splice(i,1); }
+    if(mode!=='play') return;
+    if(banner>0){ banner--; if(banner===0){ toMenu(); } }
+    else if(!resting){ tileY+=fallSpeed; if(tileY>=restY){ tileY=restY; resting=true; } }
+  }
+  function drawMenu(){
+    ctx.fillStyle='#0d0824'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='alphabetic'; ctx.font="bold 24px 'Arial Black',sans-serif";
+    ctx.fillText('🎵 Pick a Song!', W/2, MTOP-28);
+    for(let i=0;i<SONGS.length;i++){ const b=menuRect(i);
+      ctx.fillStyle=SONGS[i].mcolor; rrect(b.x,b.y,b.w,b.h,18); ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.28)'; rrect(b.x+6,b.y+6,b.w-12,b.h*0.30,10); ctx.fill();
+      ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font="bold 34px 'Arial',sans-serif";
+      ctx.fillText(SONGS[i].emoji, b.x+b.w*0.16, b.y+b.h/2);
+      ctx.font="bold 19px 'Arial',sans-serif"; ctx.fillText(SONGS[i].name, b.x+b.w*0.58, b.y+b.h/2);
+      ctx.textBaseline='alphabetic';
+    }
+  }
+  function loop(){
+    if(alive) step();
+    if(mode==='menu'){ drawMenu(); if(alive) _arcadeLoop=requestAnimationFrame(loop); return; }
+    ctx.fillStyle='#0d0824'; ctx.fillRect(0,0,W,H);
+    const pulse=0.5+0.5*Math.sin(t*0.18);
+    for(let i=1;i<N;i++){ ctx.strokeStyle='rgba(255,255,255,.05)'; ctx.beginPath(); ctx.moveTo(i*laneW,44); ctx.lineTo(i*laneW,lineY); ctx.stroke(); }
+    const cn = banner>0 ? -1 : curNote();
+    if(banner===0){ const upN=6; for(let k=1;k<=upN;k++){ const j=ni+k; if(j>=song().notes.length) break; const nn=song().notes[j]; const cx=W/2 + (k-1)*20 - ((upN-1)*20)/2; ctx.globalAlpha=Math.max(0.15,0.55-0.06*k); ctx.fillStyle=COL[nn]; ctx.beginPath(); ctx.arc(cx, 50, 6, 0, 7); ctx.fill(); } ctx.globalAlpha=1; }
+    if(banner===0 && cn>=0){ const x=cn*laneW+(laneW-tileW)/2; const y= resting ? restY + Math.sin(t*0.25)*2 : tileY;
+      ctx.fillStyle=COL[cn]; rrect(x,y,tileW,tileH,10); ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,.30)'; rrect(x+3,y+3,tileW-6,tileH*0.28,5); ctx.fill();
+      ctx.strokeStyle='#fff'; ctx.lineWidth=3; rrect(x-1,y-1,tileW+2,tileH+2,11); ctx.stroke(); ctx.lineWidth=1;
+      ctx.fillStyle='#1A0A3E'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font='bold '+Math.round(tileH*0.55)+"px 'Arial Black',sans-serif"; ctx.fillText(NOTE[cn], x+tileW/2, y+tileH/2+1); ctx.textBaseline='alphabetic'; }
+    for(const p of particles){ ctx.globalAlpha=Math.max(0,p.life); ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fill(); }
+    ctx.globalAlpha=1;
+    ctx.strokeStyle='rgba(255,255,255,.16)'; ctx.beginPath(); ctx.moveTo(0,lineY); ctx.lineTo(W,lineY); ctx.stroke();
+    for(let i=0;i<N;i++){ const x=i*laneW, lit=keyFlash[i]>0, guide=(i===cn);
+      ctx.fillStyle= lit?COL[i]:(guide?'rgba(255,255,255,'+(0.16+0.26*pulse).toFixed(3)+')':'rgba(255,255,255,.07)'); rrect(x+2,lineY+4,laneW-4,kbH-8,8); ctx.fill();
+      if(guide && !lit){ ctx.strokeStyle=COL[i]; ctx.lineWidth=3; rrect(x+2,lineY+4,laneW-4,kbH-8,8); ctx.stroke(); ctx.lineWidth=1; }
+      ctx.fillStyle= (lit||guide)?'#fff':COL[i]; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font='bold '+Math.round(kbH*0.30)+"px 'Arial Black',sans-serif"; ctx.fillText(NOTE[i], x+laneW/2, lineY+kbH/2+1); ctx.textBaseline='alphabetic'; }
+    ctx.fillStyle='rgba(255,255,255,.14)'; rrect(8,8,96,30,8); ctx.fill();
+    ctx.fillStyle='#fff'; ctx.textAlign='left'; ctx.textBaseline='middle'; ctx.font="bold 14px 'Arial',sans-serif"; ctx.fillText('← Songs', 18, 24); ctx.textBaseline='alphabetic';
+    ctx.fillStyle='#C8B8E8'; ctx.textAlign='center'; ctx.font="bold 15px 'Arial',sans-serif"; ctx.fillText('🎵 '+song().name, W/2, 24);
+    if(banner>0){ ctx.fillStyle='rgba(13,8,36,.6)'; ctx.fillRect(0,0,W,H); ctx.fillStyle='#FFD93D'; ctx.textAlign='center'; ctx.font="bold 26px 'Arial Black',sans-serif"; ctx.fillText('🎉 You played', W/2, H*0.44); ctx.fillStyle='#fff'; ctx.font="bold 22px 'Arial Black',sans-serif"; ctx.fillText(song().name+'!', W/2, H*0.44+32); }
+    if(alive){ _arcadeLoop=requestAnimationFrame(loop); }
+    else { setTimeout(()=>arcadeGameOver('musictiles',score),400); }
+  }
+  loop();
+}
+
+// ─── PATTERN TAP (Simon, with notes) ───
+function startPatternTap(){
+  const cv=setupCanvas(); const ctx=cv.getContext('2d');
+  const W=cv.width, H=cv.height;
+  const FREQ=[523.25,659.25,783.99,1046.5];
+  const BASE=['#FF6B9D','#FFC312','#00D68F','#00A8FF'];
+  const LIT =['#FFC2D8','#FFE9A8','#9BFFDB','#9BDEFF'];
+  const board=Math.min(W,H*0.78);
+  const gx=(W-board)/2, gy=Math.max(46,(H-board)/2-6);
+  const cell=board/2, gap=10;
+  function rectFor(i){ const rr=Math.floor(i/2), c=i%2; return {x:gx+c*cell+gap/2, y:gy+rr*cell+gap/2, w:cell-gap, h:cell-gap}; }
+  function rrect(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
+  let seq=[], inputIdx=0, lives=3, score=0, alive=true;
+  let state='pre', showIdx=0, phase='gap', phaseT=0, litPad=-1, litT=0, flashT=0, preT=0;
+  noteCtx();
+  function addStep(){ seq.push(Math.floor(Math.random()*4)); }
+  function enterShow(){ state='show'; showIdx=0; phase='gap'; phaseT=0; litPad=-1; setMsg('Watch and listen...'); }
+  function padAt(x,y){ for(let i=0;i<4;i++){ const r=rectFor(i); if(x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h) return i; } return -1; }
+  const tap=(e)=>{ if(!alive||state!=='input') return; const r=cv.getBoundingClientRect();
+    const x=((e.clientX!=null?e.clientX:(e.touches&&e.touches[0].clientX))||0)-r.left;
+    const y=((e.clientY!=null?e.clientY:(e.touches&&e.touches[0].clientY))||0)-r.top;
+    const p=padAt(x,y); if(p<0) return; litPad=p; litT=16; playNote(FREQ[p],0.4,'triangle');
+    if(p===seq[inputIdx]){ inputIdx++; if(inputIdx>=seq.length){ score=seq.length; setScore(score); state='win'; flashT=0; setMsg('Nice!'); } }
+    else { lives--; state='lose'; flashT=0; playNote(150,0.5,'sawtooth'); setMsg(lives>0?'Oops! Watch again...':'Game over!'); }
+  };
+  cv.addEventListener('pointerdown',tap);
+  _arcadeCleanup=()=>{ cv.removeEventListener('pointerdown',tap); };
+  setMsg('Watch the colors light up!'); setScore(0);
+  addStep();
+  function step(){
+    if(state==='pre'){ preT++; if(preT>40) enterShow(); return; }
+    if(state==='show'){ phaseT++;
+      if(phase==='gap'){ if(phaseT>(showIdx===0?20:12)){ phase='on'; phaseT=0; litPad=seq[showIdx]; playNote(FREQ[litPad],0.42,'triangle'); } }
+      else if(phase==='on'){ if(phaseT>26){ phase='off'; phaseT=0; litPad=-1; } }
+      else { if(phaseT>10){ showIdx++; if(showIdx>=seq.length){ state='input'; inputIdx=0; litPad=-1; setMsg('Your turn! Tap them in order.'); } else { phase='on'; phaseT=0; litPad=seq[showIdx]; playNote(FREQ[litPad],0.42,'triangle'); } } }
+      return; }
+    if(state==='input'){ if(litT>0){ litT--; if(litT===0) litPad=-1; } return; }
+    if(state==='win'){ flashT++; if(flashT===1) playNote(1046.5,0.5,'triangle'); if(flashT===10) playNote(1318.5,0.5,'triangle'); if(flashT>40){ addStep(); enterShow(); } return; }
+    if(state==='lose'){ flashT++; if(flashT>44){ if(lives<=0) alive=false; else { inputIdx=0; enterShow(); } } return; }
+  }
+  function loop(){
+    if(alive) step();
+    ctx.fillStyle='#0d0824'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#C8B8E8'; ctx.textAlign='center'; ctx.textBaseline='alphabetic'; ctx.font="bold 16px 'Arial',sans-serif";
+    ctx.fillText('Round '+seq.length, W/2, Math.max(24,gy-14));
+    for(let i=0;i<4;i++){ const r=rectFor(i); const on=(litPad===i)||(state==='win'&&Math.floor(flashT/6)%2===0);
+      ctx.fillStyle= on?LIT[i]:BASE[i]; rrect(r.x,r.y,r.w,r.h,16); ctx.fill();
+      if(on){ ctx.fillStyle='rgba(255,255,255,.40)'; rrect(r.x+6,r.y+6,r.w-12,r.h*0.28,8); ctx.fill(); } }
+    if(state==='lose'&&Math.floor(flashT/5)%2===0){ ctx.fillStyle='rgba(255,71,87,.16)'; ctx.fillRect(0,0,W,H); }
+    ctx.font="20px 'Arial',sans-serif"; ctx.textAlign='left'; ctx.textBaseline='top';
+    for(let i=0;i<3;i++){ ctx.globalAlpha=i<lives?1:0.25; ctx.fillText('❤️',10+i*26,8); }
+    ctx.globalAlpha=1; ctx.textBaseline='alphabetic';
+    if(alive){ _arcadeLoop=requestAnimationFrame(loop); }
+    else { setTimeout(()=>arcadeGameOver('patterntap',score),400); }
+  }
+  loop();
+}
+
 const ARCADE_GAMES = [
   {id:"rocketdodge", emoji:"🚀", name:"Rocket Dodge", desc:"Weave through asteroids!", color:"#FF6B9D", unlockBy:{cat:"reading",tier:1}},
   {id:"froghop", emoji:"🎨", name:"Color Match", desc:"Tap shapes that match the color!", color:"#00D68F", unlockBy:{cat:"reading",tier:2}},
@@ -4009,8 +4175,10 @@ const ARCADE_GAMES = [
   {id:"coindrop", emoji:"🪙", name:"Coin Drop", desc:"Drop a coin into a prize!", color:"#FFB400", unlockBy:{cat:"math",tier:2}},
   {id:"beeflyer", emoji:"🐝", name:"Bee Flyer", desc:"Tap to keep flying!", color:"#FFC312", unlockBy:{cat:"math",tier:3}},
   {id:"stackit", emoji:"🗼", name:"Stack It", desc:"Tap to stack the treats!", color:"#00A8FF", unlockBy:{cat:"math",tier:4}},
-  {id:"stackbounce", emoji:"🌀", name:"Stack Bounce", desc:"Hold to smash down the tower!", color:"#9B6FE8", unlockBy:{cat:"reading",tier:1}},
+  {id:"stackbounce", emoji:"🐰", name:"Bunny Hop", desc:"Tap to hop over the rocks!", color:"#46C26B", unlockBy:{cat:"reading",tier:1}},
   {id:"molepop", emoji:"🐹", name:"Mole Pop", desc:"Tap moles, dodge bombs!", color:"#7EC850", unlockBy:{cat:"math",tier:1}},
+  {id:"musictiles", emoji:"🎹", name:"Music Tiles", desc:"Press the glowing keys to play real songs!", color:"#9B5DE5", unlockBy:{cat:"reading",tier:2}},
+  {id:"patterntap", emoji:"🎶", name:"Pattern Tap", desc:"Watch, listen, then tap it back!", color:"#00BBF9", unlockBy:{cat:"math",tier:3}},
 ];
 
 function getUnlockedArcade(){
