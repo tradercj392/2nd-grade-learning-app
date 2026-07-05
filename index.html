@@ -246,6 +246,8 @@ const SHELDON_HOST = {
     tellingtime:["The short hand = hours, long hand = minutes!","Where is the SHORT hand pointing?"],
     money:      ["Count the biggest coins first!","Quarters=25¢, Dimes=10¢, Nickels=5¢, Pennies=1¢"],
     science:    ["Think about what you've learned about nature!","Look at the emoji for a clue!","Remember: plants, animals, Earth, and forces!","Break the question into parts!"],
+    syllableclap: ["Say the word slowly and clap each part!","ba-na-na = 3 claps!","How many beats do you hear?","Clap it out loud!"],
+    beginningsounds: ["Say the word — what sound is first?","Look at the picture for a clue!","What letter makes that first sound?","Sound it out!"],
     numorder:   ["Which number is smallest? Put that first!","Count up slowly to find the order!"],
     mathstory:  ["Read the story, then add or take away!","'gets more' means add, 'gives away' means take away!"],
   },
@@ -1747,121 +1749,33 @@ const CW={
 function compound(lv){return pk(CW[["level1","level2","level3","level4"][lv-1]],40);}
 
 // ═══════════════════ SCIENCE QUESTION BANK ═══════════════════
-const SCIENCE_Q = {
- level1:[
-  // Life Science
-  {q:"What do plants need to make food?",a:"sunlight",c:["sunlight","darkness","rocks","ice"],e:"🌱"},
-  {q:"What do frogs start life as?",a:"tadpoles",c:["tadpoles","puppies","seeds","eggs only"],e:"🐸"},
-  {q:"Which animal is a mammal?",a:"dog",c:["dog","fish","snake","butterfly"],e:"🐶"},
-  {q:"What do caterpillars turn into?",a:"butterflies",c:["butterflies","birds","fish","spiders"],e:"🦋"},
-  {q:"Where do fish breathe?",a:"through gills",c:["through gills","through lungs","through skin","through fins"],e:"🐟"},
-  {q:"What is the biggest organ in the human body?",a:"skin",c:["skin","heart","brain","stomach"],e:"🫀"},
-  {q:"Which part of a plant makes food?",a:"leaves",c:["leaves","roots","stem","flowers"],e:"🌿"},
-  {q:"What do roots do for a plant?",a:"absorb water",c:["absorb water","make flowers","produce fruit","catch sunlight"],e:"🌱"},
-  {q:"Which animal lays eggs?",a:"chicken",c:["chicken","cow","dog","horse"],e:"🐔"},
-  {q:"What do bees make?",a:"honey",c:["honey","milk","butter","jam"],e:"🐝"},
-  {q:"How many legs does a spider have?",a:"8",c:["8","6","4","10"],e:"🕷️"},
-  {q:"What do herbivores eat?",a:"only plants",c:["only plants","only meat","both plants and meat","rocks"],e:"🐄"},
-  {q:"What is the heart's job?",a:"pump blood",c:["pump blood","digest food","filter air","think thoughts"],e:"❤️"},
-  {q:"Which sense do we use our nose for?",a:"smell",c:["smell","sight","hearing","taste"],e:"👃"},
-  {q:"What do we call animals that eat only meat?",a:"carnivores",c:["carnivores","herbivores","omnivores","producers"],e:"🦁"},
-  // Earth Science
-  {q:"What is the closest star to Earth?",a:"the Sun",c:["the Sun","the Moon","Mars","Venus"],e:"☀️"},
-  {q:"What causes day and night?",a:"Earth spinning",c:["Earth spinning","the Sun moving","the Moon moving","clouds"],e:"🌍"},
-  {q:"What is rain made of?",a:"water",c:["water","ice","gas","dust"],e:"🌧️"},
-  {q:"What are clouds made of?",a:"tiny water droplets",c:["tiny water droplets","smoke","cotton","gas"],e:"☁️"},
-  {q:"Which is the largest planet?",a:"Jupiter",c:["Jupiter","Earth","Saturn","Mars"],e:"🪐"},
-  {q:"What do we call a very strong spinning wind storm?",a:"tornado",c:["tornado","rainbow","blizzard","thunder"],e:"🌪️"},
-  {q:"What is soil made from?",a:"broken rocks and plants",c:["broken rocks and plants","water","air","sand only"],e:"🌍"},
-  {q:"How many seasons are there?",a:"4",c:["4","2","3","6"],e:"🌸"},
-  {q:"What layer of Earth do we live on?",a:"the crust",c:["the crust","the mantle","the core","the magma"],e:"🌍"},
-  {q:"What causes an earthquake?",a:"moving tectonic plates",c:["moving tectonic plates","heavy rain","wind","the Moon"],e:"🌋"},
-  // Physical Science
-  {q:"What is ice?",a:"frozen water",c:["frozen water","melted rock","solid air","cold snow"],e:"🧊"},
-  {q:"Which of these is a liquid?",a:"juice",c:["juice","rock","wood","ice"],e:"🧃"},
-  {q:"What makes objects fall to the ground?",a:"gravity",c:["gravity","wind","magnetism","electricity"],e:"⬇️"},
-  {q:"What does a mirror do to light?",a:"reflects it",c:["reflects it","absorbs it","creates it","destroys it"],e:"🪞"},
-  {q:"Which is NOT a source of light?",a:"a rock",c:["a rock","the Sun","a flashlight","fire"],e:"🔦"},
- ],
- level2:[
-  // Life Science
-  {q:"What is the process plants use to make food called?",a:"photosynthesis",c:["photosynthesis","respiration","digestion","metamorphosis"],e:"🌿"},
-  {q:"What do we call the change from caterpillar to butterfly?",a:"metamorphosis",c:["metamorphosis","hibernation","migration","pollination"],e:"🦋"},
-  {q:"Which organ pumps blood through the body?",a:"heart",c:["heart","lungs","liver","stomach"],e:"❤️"},
-  {q:"What are the tiny building blocks of all living things?",a:"cells",c:["cells","atoms","bones","genes"],e:"🔬"},
-  {q:"What do we call animals with a backbone?",a:"vertebrates",c:["vertebrates","invertebrates","mammals","reptiles"],e:"🐍"},
-  {q:"How do plants reproduce using flowers?",a:"pollination",c:["pollination","photosynthesis","germination","respiration"],e:"🌸"},
-  {q:"What gas do plants release during photosynthesis?",a:"oxygen",c:["oxygen","carbon dioxide","nitrogen","hydrogen"],e:"🌿"},
-  {q:"What do we call animals that are active at night?",a:"nocturnal",c:["nocturnal","diurnal","migratory","hibernating"],e:"🦉"},
-  {q:"Which nutrient helps build strong bones?",a:"calcium",c:["calcium","protein","sugar","fat"],e:"🦴"},
-  {q:"What is the outer layer of a tree trunk called?",a:"bark",c:["bark","leaves","roots","sap"],e:"🌳"},
-  // Earth Science
-  {q:"What do we call the path Earth takes around the Sun?",a:"orbit",c:["orbit","rotation","revolution","axis"],e:"🌍"},
-  {q:"What causes the seasons on Earth?",a:"Earth's tilted axis",c:["Earth's tilted axis","distance from Sun","Moon's gravity","cloud cover"],e:"🌎"},
-  {q:"What is a fossil?",a:"remains of ancient life in rock",c:["remains of ancient life in rock","a type of mineral","a meteor","a crystal"],e:"🦕"},
-  {q:"What do we call molten rock above ground?",a:"lava",c:["lava","magma","granite","basalt"],e:"🌋"},
-  {q:"What is the water cycle?",a:"water moving between ocean, air and land",c:["water moving between ocean, air and land","water turning to ice","rain falling","rivers flowing"],e:"💧"},
-  {q:"Which planet is known as the Red Planet?",a:"Mars",c:["Mars","Venus","Jupiter","Saturn"],e:"🔴"},
-  {q:"What causes tides in the ocean?",a:"the Moon's gravity",c:["the Moon's gravity","the wind","the Sun's heat","Earth spinning"],e:"🌊"},
-  {q:"What is the ozone layer?",a:"a layer protecting Earth from UV rays",c:["a layer protecting Earth from UV rays","a type of cloud","the ocean floor","Earth's inner core"],e:"🌍"},
-  // Physical Science
-  {q:"What are the three states of matter?",a:"solid, liquid, gas",c:["solid, liquid, gas","hot, warm, cold","heavy, light, medium","big, small, tiny"],e:"💧"},
-  {q:"What is energy?",a:"the ability to do work",c:["the ability to do work","a type of matter","a liquid","the weight of objects"],e:"⚡"},
-  {q:"What happens to water when it is heated?",a:"it evaporates",c:["it evaporates","it freezes","it sinks","it turns solid"],e:"💨"},
-  {q:"Which travels faster — light or sound?",a:"light",c:["light","sound","they are the same","it depends"],e:"💡"},
-  {q:"What is a magnet attracted to?",a:"iron and steel",c:["iron and steel","wood","plastic","glass"],e:"🧲"},
-  {q:"What is electricity?",a:"the flow of electrons",c:["the flow of electrons","a type of light","hot air","magnetic force"],e:"⚡"},
-  {q:"What do we call energy from the Sun?",a:"solar energy",c:["solar energy","wind energy","nuclear energy","fossil fuel"],e:"☀️"},
- ],
- level3:[
-  // Life Science
-  {q:"What is the process by which organisms make copies of themselves?",a:"reproduction",c:["reproduction","photosynthesis","respiration","digestion"],e:"🧬"},
-  {q:"What do we call the study of living things?",a:"biology",c:["biology","geology","astronomy","chemistry"],e:"🔬"},
-  {q:"What is a food chain?",a:"the order animals eat each other",c:["the order animals eat each other","a chain made of food","how plants grow","a type of ecosystem"],e:"🦁"},
-  {q:"What gas do animals breathe in?",a:"oxygen",c:["oxygen","carbon dioxide","nitrogen","hydrogen"],e:"🫁"},
-  {q:"What is an ecosystem?",a:"all living and non-living things in an area",c:["all living and non-living things in an area","only the animals in a forest","a type of habitat","a food chain"],e:"🌍"},
-  {q:"What is adaptation in animals?",a:"features helping survival in their habitat",c:["features helping survival in their habitat","changing color for fun","moving to a new place","growing larger over time"],e:"🐆"},
-  {q:"What is the role of decomposers in nature?",a:"break down dead organisms",c:["break down dead organisms","produce oxygen","eat plants","hunt prey"],e:"🍄"},
-  {q:"What are chromosomes?",a:"structures carrying genetic information",c:["structures carrying genetic information","types of cells","blood vessels","types of bones"],e:"🧬"},
-  // Earth Science
-  {q:"What is the greenhouse effect?",a:"gases trapping heat in Earth's atmosphere",c:["gases trapping heat in Earth's atmosphere","plants growing in greenhouses","sunlight warming plants","ice melting in spring"],e:"🌡️"},
-  {q:"What is erosion?",a:"wearing away of rock or soil by wind and water",c:["wearing away of rock or soil by wind and water","building up of mountains","type of earthquake","how volcanoes form"],e:"⛰️"},
-  {q:"What is the difference between rotation and revolution?",a:"rotation is spinning, revolution is orbiting",c:["rotation is spinning, revolution is orbiting","they are the same thing","rotation is faster","revolution is smaller"],e:"🌍"},
-  {q:"What causes a solar eclipse?",a:"Moon blocks the Sun's light",c:["Moon blocks the Sun's light","Earth blocks the Moon","clouds block the Sun","Sun moves away"],e:"🌑"},
-  {q:"What is biodiversity?",a:"variety of life in an area",c:["variety of life in an area","a type of ecosystem","distance between planets","strength of gravity"],e:"🌿"},
-  // Physical Science
-  {q:"What is Newton's First Law?",a:"objects stay still or moving unless force acts",c:["objects stay still or moving unless force acts","every action has a reaction","force equals mass times acceleration","objects attract each other"],e:"🍎"},
-  {q:"What is the difference between mass and weight?",a:"mass is amount of matter, weight is gravitational pull",c:["mass is amount of matter, weight is gravitational pull","they are the same thing","mass changes on the Moon","weight never changes"],e:"⚖️"},
-  {q:"What is a chemical change?",a:"a change creating a new substance",c:["a change creating a new substance","changing shape only","melting ice","dissolving salt"],e:"🧪"},
-  {q:"What is refraction of light?",a:"bending of light passing through materials",c:["bending of light passing through materials","bouncing of light off surfaces","blocking of light","creation of shadows"],e:"🔺"},
-  {q:"What is potential energy?",a:"stored energy due to position",c:["stored energy due to position","energy of motion","heat energy","light energy"],e:"⚡"},
-  {q:"What is the law of conservation of energy?",a:"energy cannot be created or destroyed",c:["energy cannot be created or destroyed","energy always increases","energy only comes from the Sun","energy disappears over time"],e:"⚡"},
- ],
- level4:[
-  // Life Science
-  {q:"What is the process by which organisms make copies of themselves?",a:"reproduction",c:["reproduction","photosynthesis","respiration","digestion"],e:"🧬"},
-  {q:"What do we call the study of living things?",a:"biology",c:["biology","geology","astronomy","chemistry"],e:"🔬"},
-  {q:"What is a food chain?",a:"the order animals eat each other",c:["the order animals eat each other","a chain made of food","how plants grow","a type of ecosystem"],e:"🦁"},
-  {q:"What gas do animals breathe in?",a:"oxygen",c:["oxygen","carbon dioxide","nitrogen","hydrogen"],e:"🫁"},
-  {q:"What is an ecosystem?",a:"all living and non-living things in an area",c:["all living and non-living things in an area","only the animals in a forest","a type of habitat","a food chain"],e:"🌍"},
-  {q:"What is adaptation in animals?",a:"features helping survival in their habitat",c:["features helping survival in their habitat","changing color for fun","moving to a new place","growing larger over time"],e:"🐆"},
-  {q:"What is the role of decomposers in nature?",a:"break down dead organisms",c:["break down dead organisms","produce oxygen","eat plants","hunt prey"],e:"🍄"},
-  {q:"What are chromosomes?",a:"structures carrying genetic information",c:["structures carrying genetic information","types of cells","blood vessels","types of bones"],e:"🧬"},
-  // Earth Science
-  {q:"What is the greenhouse effect?",a:"gases trapping heat in Earth's atmosphere",c:["gases trapping heat in Earth's atmosphere","plants growing in greenhouses","sunlight warming plants","ice melting in spring"],e:"🌡️"},
-  {q:"What is erosion?",a:"wearing away of rock or soil by wind and water",c:["wearing away of rock or soil by wind and water","building up of mountains","type of earthquake","how volcanoes form"],e:"⛰️"},
-  {q:"What is the difference between rotation and revolution?",a:"rotation is spinning, revolution is orbiting",c:["rotation is spinning, revolution is orbiting","they are the same thing","rotation is faster","revolution is smaller"],e:"🌍"},
-  {q:"What causes a solar eclipse?",a:"Moon blocks the Sun's light",c:["Moon blocks the Sun's light","Earth blocks the Moon","clouds block the Sun","Sun moves away"],e:"🌑"},
-  {q:"What is biodiversity?",a:"variety of life in an area",c:["variety of life in an area","a type of ecosystem","distance between planets","strength of gravity"],e:"🌿"},
-  // Physical Science
-  {q:"What is Newton's First Law?",a:"objects stay still or moving unless force acts",c:["objects stay still or moving unless force acts","every action has a reaction","force equals mass times acceleration","objects attract each other"],e:"🍎"},
-  {q:"What is the difference between mass and weight?",a:"mass is amount of matter, weight is gravitational pull",c:["mass is amount of matter, weight is gravitational pull","they are the same thing","mass changes on the Moon","weight never changes"],e:"⚖️"},
-  {q:"What is a chemical change?",a:"a change creating a new substance",c:["a change creating a new substance","changing shape only","melting ice","dissolving salt"],e:"🧪"},
-  {q:"What is refraction of light?",a:"bending of light passing through materials",c:["bending of light passing through materials","bouncing of light off surfaces","blocking of light","creation of shadows"],e:"🔺"},
-  {q:"What is potential energy?",a:"stored energy due to position",c:["stored energy due to position","energy of motion","heat energy","light energy"],e:"⚡"},
-  {q:"What is the law of conservation of energy?",a:"energy cannot be created or destroyed",c:["energy cannot be created or destroyed","energy always increases","energy only comes from the Sun","energy disappears over time"],e:"⚡"},
- ]
-};
+const SCIENCE_Q = [
+  {q:"What do plants need to grow?",a:"water",c:["water","candy","toys","rocks"],e:"🌱"},
+  {q:"Which animal can fly?",a:"bird",c:["bird","dog","fish","cow"],e:"🐦"},
+  {q:"Where do fish live?",a:"in water",c:["in water","in trees","in the sky","in sand"],e:"🐟"},
+  {q:"What do bees make?",a:"honey",c:["honey","milk","bread","juice"],e:"🐝"},
+  {q:"Which one is a baby dog?",a:"puppy",c:["puppy","kitten","calf","chick"],e:"🐶"},
+  {q:"What do we use to see?",a:"eyes",c:["eyes","ears","nose","hands"],e:"👀"},
+  {q:"What do we use to hear?",a:"ears",c:["ears","eyes","feet","mouth"],e:"👂"},
+  {q:"Is ice hot or cold?",a:"cold",c:["cold","hot","warm","spicy"],e:"🧊"},
+  {q:"What comes from a chicken?",a:"an egg",c:["an egg","milk","wool","honey"],e:"🥚"},
+  {q:"Which one is a living thing?",a:"a cat",c:["a cat","a rock","a chair","a cup"],e:"🐱"},
+  {q:"What do cows give us?",a:"milk",c:["milk","eggs","honey","juice"],e:"🐄"},
+  {q:"Which season is cold and snowy?",a:"winter",c:["winter","summer","spring","fall"],e:"❄️"},
+  {q:"What do we breathe?",a:"air",c:["air","water","sand","milk"],e:"🌬️"},
+  {q:"Which animal says moo?",a:"a cow",c:["a cow","a dog","a cat","a duck"],e:"🐄"},
+  {q:"What grows on an apple tree?",a:"apples",c:["apples","fish","shoes","cars"],e:"🍎"},
+  {q:"Which one floats on water?",a:"a boat",c:["a boat","a rock","a brick","a key"],e:"⛵"},
+  {q:"What gives us light in the daytime?",a:"the sun",c:["the sun","the moon","stars","a lamp"],e:"☀️"},
+  {q:"What do plants grow from?",a:"seeds",c:["seeds","rocks","paper","glass"],e:"🌰"},
+  {q:"What do we use to smell?",a:"our nose",c:["our nose","our ears","our eyes","our feet"],e:"👃"},
+  {q:"Where do birds lay their eggs?",a:"in a nest",c:["in a nest","in a pond","in a cave","in a box"],e:"🐦"},
+  {q:"What happens to snow when it gets warm?",a:"it melts",c:["it melts","it grows","it flies","it sings"],e:"☃️"},
+  {q:"Which animal has a long trunk?",a:"an elephant",c:["an elephant","a rabbit","a frog","a duck"],e:"🐘"},
+  {q:"Which one can you drink?",a:"water",c:["water","sand","wood","glass"],e:"💧"},
+  {q:"What color is the sky on a sunny day?",a:"blue",c:["blue","purple","brown","black"],e:"☀️"},
+  {q:"Which one is a fruit?",a:"a banana",c:["a banana","a spoon","a sock","a chair"],e:"🍌"}
+];
 
 
 // ═══════════════════ SINGAPORE PRIMARY MATH 1A GAMES ═══════════════════
@@ -1994,13 +1908,36 @@ function pictureGraphs(lv){
 }
 
 function scienceGame(lv){
-  const bank = SCIENCE_Q[["level1","level2","level3","level4"][lv-1]];
-  return pk(bank, Math.min(40, bank.length)).map(r=>({
-    question: r.q,
-    answer: r.a,
+  return pk(SCIENCE_Q, Math.min(20, SCIENCE_Q.length)).map(r=>({
+    question: r.q, answer: r.a,
     choices: sh([r.a, ...r.c.filter(x=>x!==r.a).slice(0,3)]),
     emoji: r.e
   }));
+}
+
+const SYLLABLE_WORDS=[
+  {w:"cat",n:1,e:"🐱"},{w:"dog",n:1,e:"🐶"},{w:"sun",n:1,e:"☀️"},{w:"ball",n:1,e:"⚽"},{w:"fish",n:1,e:"🐟"},{w:"star",n:1,e:"⭐"},{w:"tree",n:1,e:"🌳"},{w:"frog",n:1,e:"🐸"},{w:"bee",n:1,e:"🐝"},{w:"cake",n:1,e:"🍰"},
+  {w:"apple",n:2,e:"🍎"},{w:"tiger",n:2,e:"🐯"},{w:"pencil",n:2,e:"✏️"},{w:"flower",n:2,e:"🌸"},{w:"baby",n:2,e:"👶"},{w:"monkey",n:2,e:"🐵"},{w:"pizza",n:2,e:"🍕"},{w:"lemon",n:2,e:"🍋"},{w:"robot",n:2,e:"🤖"},{w:"turtle",n:2,e:"🐢"},{w:"rainbow",n:2,e:"🌈"},
+  {w:"banana",n:3,e:"🍌"},{w:"butterfly",n:3,e:"🦋"},{w:"elephant",n:3,e:"🐘"},{w:"umbrella",n:3,e:"☂️"},{w:"dinosaur",n:3,e:"🦕"},{w:"tomato",n:3,e:"🍅"},{w:"computer",n:3,e:"💻"},{w:"kangaroo",n:3,e:"🦘"},{w:"gorilla",n:3,e:"🦍"}
+];
+function syllableGame(lv){
+  return pk(SYLLABLE_WORDS, Math.min(16, SYLLABLE_WORDS.length)).map(r=>({
+    question: `How many claps? &nbsp;<span style="font-size:24px;font-weight:900;color:#FF8C00;">${r.w}</span>`,
+    answer: String(r.n),
+    choices: sh([String(r.n), ...["1","2","3"].filter(x=>x!==String(r.n))]),
+    emoji: r.e
+  }));
+}
+const BEGIN_WORDS=[
+  {w:"dog",e:"🐶"},{w:"cat",e:"🐱"},{w:"sun",e:"☀️"},{w:"ball",e:"⚽"},{w:"fish",e:"🐟"},{w:"moon",e:"🌙"},{w:"pig",e:"🐷"},{w:"key",e:"🔑"},{w:"van",e:"🚐"},{w:"fox",e:"🦊"},{w:"hat",e:"🎩"},{w:"lion",e:"🦁"},{w:"snake",e:"🐍"},{w:"apple",e:"🍎"},{w:"egg",e:"🥚"},{w:"duck",e:"🦆"},{w:"goat",e:"🐐"},{w:"zebra",e:"🦓"},{w:"whale",e:"🐳"},{w:"bear",e:"🐻"},{w:"nest",e:"🪺"},{w:"tiger",e:"🐯"},{w:"owl",e:"🦉"},{w:"leaf",e:"🍃"},{w:"ring",e:"💍"}
+];
+function beginSoundGame(lv){
+  const ALPH="BCDFGHJKLMNPRSTVWZ".split("");
+  return pk(BEGIN_WORDS, Math.min(16, BEGIN_WORDS.length)).map(r=>{
+    const L=r.w[0].toUpperCase();
+    const ds=sh(ALPH.filter(x=>x!==L)).slice(0,2);
+    return { question:`What letter does this word start with? &nbsp;<span style="font-size:22px;font-weight:900;color:#9B5DE5;">${r.w}</span>`, answer:L, choices:sh([L,...ds]), emoji:r.e };
+  });
 }
 
 
@@ -2100,10 +2037,12 @@ const GAMES=[
  {id:"money",label:"Count Money",emoji:"💰",color:"#00D68F",grad:"linear-gradient(135deg,#00D68F,#00A86B)",std:"CCSS.MATH.2.MD.C8"},
   {id:"science",label:"Science!",emoji:"🔬",color:"#00A8FF",grad:"linear-gradient(135deg,#00A8FF,#0077CC)",std:"NGSS.K-2"},
  {id:"mathstory",label:"Math Stories",emoji:"🧮",color:"#FF8C00",grad:"linear-gradient(135deg,#FFB347,#FF8C00)",std:"CCSS.MATH.2.OA"},
+ {id:"syllableclap",label:"Syllable Clap",emoji:"👏",color:"#FF8C00",grad:"linear-gradient(135deg,#FFB347,#FF8C00)",std:"STELLAR.K-2"},
+ {id:"beginningsounds",label:"Beginning Sounds",emoji:"🔤",color:"#9B5DE5",grad:"linear-gradient(135deg,#B983FF,#9B5DE5)",std:"STELLAR.K-2"},
 ];
 
 function loadGame(id,lv){
- const m={flashcards:flashCards,mathflash:flashCardsMath,mathpop:mathPop,truefalseread:trueFalseRead,truefalsemath:trueFalseMath,fillblank:fillBlank,match:matchPairs,unscramble:unscramble,truefalse:trueFalse,wordpicture:wordPicture,numorder:numOrder,rhymetime:rhymeTime,wordfamily:wordFamily,greaterless:greaterLess,oddoneout:oddOneOut,counting:counting,catsort:catSort,placevalue:placeValue,skipcounting:skipCounting,sightwords:sightWords,sentbuild:sentBuild,compound:compound,tellingtime:tellingTime,money:countMoney,science:scienceGame,mathstory:mathStory,numberbonds:numberBonds,ordinal:ordinalNumbers,shapes:shapesPatterns,length:lengthComparison,picgraph:pictureGraphs};
+ const m={flashcards:flashCards,mathflash:flashCardsMath,mathpop:mathPop,truefalseread:trueFalseRead,truefalsemath:trueFalseMath,fillblank:fillBlank,match:matchPairs,unscramble:unscramble,truefalse:trueFalse,wordpicture:wordPicture,numorder:numOrder,rhymetime:rhymeTime,wordfamily:wordFamily,greaterless:greaterLess,oddoneout:oddOneOut,counting:counting,catsort:catSort,placevalue:placeValue,skipcounting:skipCounting,sightwords:sightWords,sentbuild:sentBuild,compound:compound,tellingtime:tellingTime,money:countMoney,science:scienceGame,syllableclap:syllableGame,beginningsounds:beginSoundGame,mathstory:mathStory,numberbonds:numberBonds,ordinal:ordinalNumbers,shapes:shapesPatterns,length:lengthComparison,picgraph:pictureGraphs};
  return Promise.resolve(m[id](lv));
 }
 
@@ -2144,6 +2083,8 @@ const GAME_META={
   tellingtime:{emoji:"🕐",label:"Telling Time",color:"#FF6B9D"},
   money:{emoji:"💰",label:"Count Money",color:"#FFD93D"},
   science:{emoji:"🔬",label:"Science!",color:"#00B894"},
+  syllableclap:{emoji:"👏",label:"Syllable Clap",color:"#FF8C00"},
+  beginningsounds:{emoji:"🔤",label:"Beginning Sounds",color:"#9B5DE5"},
   mathstory:{emoji:"🧮",label:"Math Stories",color:"#FF8C00"},
   numberbonds:{emoji:"🔗",label:"Number Bonds",color:"#6C3FC8"},
   ordinal:{emoji:"🥇",label:"Ordinal Numbers",color:"#FF8C00"},
@@ -2251,7 +2192,7 @@ function renderArcade(){
 }
 
 function allGamesComplete(){
-  const all=["flashcards","sightwords","rhymetime","fillblank","wordfamily","unscramble","wordpicture","compound","sentbuild","oddoneout","catsort","truefalseread","mathflash","counting","greaterless","mathpop","skipcounting","placevalue","tellingtime","money","truefalsemath","science"];
+  const all=["flashcards","sightwords","rhymetime","fillblank","wordfamily","unscramble","wordpicture","compound","sentbuild","oddoneout","catsort","truefalseread","mathflash","counting","greaterless","mathpop","skipcounting","placevalue","tellingtime","money","truefalsemath","science","syllableclap","beginningsounds"];
   const done=S.completedGames||{};
   return all.every(g=>done[g]);
 }
@@ -2456,7 +2397,7 @@ function renderPlaying(app){
     goResults();
   }
 };
- const runners={flashcards:rFlash,mathpop:rPop,mathflash:rFlash,fillblank:rFill,match:rMatch,unscramble:rScram,truefalse:rTF,truefalseread:rTF,truefalsemath:rTF,wordpicture:rWP,numorder:rNO,rhymetime:rRhyme,wordfamily:rWF,greaterless:rGL,oddoneout:rOdd,counting:rCount,catsort:rCat,placevalue:rPV,skipcounting:rSC,sightwords:rSW,sentbuild:rSB,compound:rCW,tellingtime:rTT,money:rMoney,science:rScience,mathstory:rMathStory,numberbonds:rNB,ordinal:rOrd,shapes:rShapes,length:rLen,picgraph:rPG};
+ const runners={flashcards:rFlash,mathpop:rPop,mathflash:rFlash,fillblank:rFill,match:rMatch,unscramble:rScram,truefalse:rTF,truefalseread:rTF,truefalsemath:rTF,wordpicture:rWP,numorder:rNO,rhymetime:rRhyme,wordfamily:rWF,greaterless:rGL,oddoneout:rOdd,counting:rCount,catsort:rCat,placevalue:rPV,skipcounting:rSC,sightwords:rSW,sentbuild:rSB,compound:rCW,tellingtime:rTT,money:rMoney,science:rScience,syllableclap:rSyllable,beginningsounds:rBeginSound,mathstory:rMathStory,numberbonds:rNB,ordinal:rOrd,shapes:rShapes,length:rLen,picgraph:rPG};
  loadGame(S.gameId,S.level).then(data=>{ if(S.gameId!=='flashcards'){try{speakGreeting();}catch(e){}} runners[S.gameId](area,data,S.level,done); });
 }
 
@@ -2854,6 +2795,10 @@ ${maybeNextBtn(i,rounds.length)}</div>`;if(!rv)pendingTap(el,".sci-btn",()=>ch!=
 
 
 
+function rSyllable(el,rounds,lv,done){let i=0,sc=0,ch=null;function show(){if(i>=rounds.length)return;const r=rounds[i];const rv=ch!==null;const ok=rv&&r.choices[ch]?.toLowerCase()===r.answer.toLowerCase();el.innerHTML=`${pb(i,rounds.length,sc)}<div class="card">${ms(i===0&&!rv?'greet':rv?(ok?'correct':'wrong'):'idle','syllableclap')}<div style="text-align:center;margin-bottom:6px;"><span style="font-size:54px;">${r.emoji}</span></div>${lbl("👏","SYLLABLES","#FF8C00")}<div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:18px;color:#1A0A3E;text-align:center;margin-bottom:14px;background:#FFF6E9;border-radius:14px;padding:12px;line-height:1.4;">${r.question}</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">${r.choices.map((c,ci)=>{const isC=c.toLowerCase()===r.answer.toLowerCase();const tp=ch===ci;let bg="#FFF6E9",bo="2px solid rgba(255,140,0,.25)",tc="#1A0A3E";if(rv&&isC){bg="#E8FFF4";bo="3px solid #00D68F";tc="#00A86B";}else if(tp&&!isC){bg="#FFF0F2";bo="3px solid #FF4757";tc="#CC2F3E";}else if(rv){bg="rgba(200,200,200,.2)";bo="2px solid #ddd";tc="#999";}return `<button class="syl-btn" data-ci="${ci}" style="background:${bg};border:${bo};border-radius:14px;padding:18px 8px;font-family:'Arial Black',sans-serif;font-weight:800;font-size:30px;color:${tc};cursor:${rv?'default':'pointer'};animation:${rv&&isC?'pop .35s ease':'none'};width:100%;box-shadow:0 3px 8px rgba(0,0,0,.08);">${c}</button>`;}).join("")}</div>${rv?`<div style="text-align:center;margin-top:10px;animation:fadeUp .3s ease;"><div style="font-family:'Bangers','Arial Black',sans-serif;font-size:${ok?22:18}px;color:${ok?'#00D68F':'#FF4757'};letter-spacing:1px;">${ok?"🎉 CORRECT!":"😅 ANSWER: "+r.answer}</div></div>`:""}${maybeNextBtn(i,rounds.length)}</div>`;if(!rv)pendingTap(el,".syl-btn",()=>ch!==null,(ci,b)=>{ch=parseInt(ci);const ok=r.choices[ch]?.toLowerCase()===r.answer.toLowerCase();ok?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||10;if(ns>=thr||i+1>=rounds.length)done(ns,Math.min(i+1,rounds.length));else{sc=ns;i++;ch=null;show();}};const _adv=_advance;show();setTimeout(()=>{if(_adv)_adv();},800);});}show();}
+
+function rBeginSound(el,rounds,lv,done){let i=0,sc=0,ch=null;function show(){if(i>=rounds.length)return;const r=rounds[i];const rv=ch!==null;const ok=rv&&r.choices[ch]?.toLowerCase()===r.answer.toLowerCase();el.innerHTML=`${pb(i,rounds.length,sc)}<div class="card">${ms(i===0&&!rv?'greet':rv?(ok?'correct':'wrong'):'idle','beginningsounds')}<div style="text-align:center;margin-bottom:6px;"><span style="font-size:54px;">${r.emoji}</span></div>${lbl("🔤","FIRST LETTER","#9B5DE5")}<div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:18px;color:#1A0A3E;text-align:center;margin-bottom:14px;background:#F3EDFF;border-radius:14px;padding:12px;line-height:1.4;">${r.question}</div><div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">${r.choices.map((c,ci)=>{const isC=c.toLowerCase()===r.answer.toLowerCase();const tp=ch===ci;let bg="#F3EDFF",bo="2px solid rgba(155,93,229,.25)",tc="#1A0A3E";if(rv&&isC){bg="#E8FFF4";bo="3px solid #00D68F";tc="#00A86B";}else if(tp&&!isC){bg="#FFF0F2";bo="3px solid #FF4757";tc="#CC2F3E";}else if(rv){bg="rgba(200,200,200,.2)";bo="2px solid #ddd";tc="#999";}return `<button class="bs-btn" data-ci="${ci}" style="background:${bg};border:${bo};border-radius:14px;padding:18px 8px;font-family:'Arial Black',sans-serif;font-weight:800;font-size:30px;color:${tc};cursor:${rv?'default':'pointer'};animation:${rv&&isC?'pop .35s ease':'none'};width:100%;box-shadow:0 3px 8px rgba(0,0,0,.08);">${c}</button>`;}).join("")}</div>${rv?`<div style="text-align:center;margin-top:10px;animation:fadeUp .3s ease;"><div style="font-family:'Bangers','Arial Black',sans-serif;font-size:${ok?22:18}px;color:${ok?'#00D68F':'#FF4757'};letter-spacing:1px;">${ok?"🎉 CORRECT!":"😅 ANSWER: "+r.answer}</div></div>`:""}${maybeNextBtn(i,rounds.length)}</div>`;if(!rv)pendingTap(el,".bs-btn",()=>ch!==null,(ci,b)=>{ch=parseInt(ci);const ok=r.choices[ch]?.toLowerCase()===r.answer.toLowerCase();ok?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||10;if(ns>=thr||i+1>=rounds.length)done(ns,Math.min(i+1,rounds.length));else{sc=ns;i++;ch=null;show();}};const _adv=_advance;show();setTimeout(()=>{if(_adv)_adv();},800);});}show();}
+
 // ═══════════════════ 2-PLAYER SYSTEM ═══════════════════
 
 const CHARS = [
@@ -3126,7 +3071,7 @@ let _2pRoundData = null;
 let _2pP1Answer  = null; // {correct: bool}
 
 function run2PGame(area, data, lv, gameId){
- const runners = {flashcards:rFlash,mathpop:rPop,mathflash:rFlash,fillblank:rFill,match:rMatch,unscramble:rScram,truefalse:rTF,truefalseread:rTF,truefalsemath:rTF,wordpicture:rWP,numorder:rNO,rhymetime:rRhyme,wordfamily:rWF,greaterless:rGL,oddoneout:rOdd,counting:rCount,catsort:rCat,placevalue:rPV,skipcounting:rSC,sightwords:rSW,sentbuild:rSB,compound:rCW,tellingtime:rTT,money:rMoney,science:rScience};
+ const runners = {flashcards:rFlash,mathpop:rPop,mathflash:rFlash,fillblank:rFill,match:rMatch,unscramble:rScram,truefalse:rTF,truefalseread:rTF,truefalsemath:rTF,wordpicture:rWP,numorder:rNO,rhymetime:rRhyme,wordfamily:rWF,greaterless:rGL,oddoneout:rOdd,counting:rCount,catsort:rCat,placevalue:rPV,skipcounting:rSC,sightwords:rSW,sentbuild:rSB,compound:rCW,tellingtime:rTT,money:rMoney,science:rScience,syllableclap:rSyllable,beginningsounds:rBeginSound};
  _2pRoundData = data;
  _2pP1Answer  = null;
  P2.currentTurn = 1;
@@ -3160,7 +3105,7 @@ function doP2Turn(){
   <div id="game-area"></div>
  </div>`;
  const area = document.getElementById("game-area");
- const runners = {flashcards:rFlash,mathpop:rPop,mathflash:rFlash,fillblank:rFill,match:rMatch,unscramble:rScram,truefalse:rTF,truefalseread:rTF,truefalsemath:rTF,wordpicture:rWP,numorder:rNO,rhymetime:rRhyme,wordfamily:rWF,greaterless:rGL,oddoneout:rOdd,counting:rCount,catsort:rCat,placevalue:rPV,skipcounting:rSC,sightwords:rSW,sentbuild:rSB,compound:rCW,tellingtime:rTT,money:rMoney,science:rScience};
+ const runners = {flashcards:rFlash,mathpop:rPop,mathflash:rFlash,fillblank:rFill,match:rMatch,unscramble:rScram,truefalse:rTF,truefalseread:rTF,truefalsemath:rTF,wordpicture:rWP,numorder:rNO,rhymetime:rRhyme,wordfamily:rWF,greaterless:rGL,oddoneout:rOdd,counting:rCount,catsort:rCat,placevalue:rPV,skipcounting:rSC,sightwords:rSW,sentbuild:rSB,compound:rCW,tellingtime:rTT,money:rMoney,science:rScience,syllableclap:rSyllable,beginningsounds:rBeginSound};
 
  function p2Done(score, total){
   const correct = score > 0;
@@ -3881,7 +3826,8 @@ const CATEGORIES = {
       ["flashcards","sightwords","rhymetime"],
       ["fillblank","wordfamily","unscramble"],
       ["wordpicture","compound","sentbuild"],
-      ["oddoneout","catsort","truefalseread","science"]
+      ["oddoneout","catsort","truefalseread"],
+      ["science","syllableclap","beginningsounds"]
     ]
   },
   math: {
