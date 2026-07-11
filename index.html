@@ -3257,7 +3257,7 @@ function startArcadeGame(id){
     rocketdodge: startRocketDodge, froghop: startFrogHop, balloonpop: startBalloonPop,
     starcatcher: startStarCatcher, fishfeast: startFishFeast, coindrop: startCoinDrop,
     beeflyer: startBeeFlyer, stackit: startStackIt, stackbounce: startBunnyHop, molepop: startMolePop,
-    musictiles: startMusicTiles, patterntap: startPatternTap, soundmatch: startSoundMatch, notedetective: startNoteDetective
+    musictiles: startMusicTiles, patterntap: startPatternTap, drumkit: startDrumKit, xylophone: startXylophone
   };
   (starters[id] || (()=>{}))();
 }
@@ -4339,6 +4339,174 @@ function startNoteDetective(){
   loop();
 }
 
+// ─── free-play percussion synth ───
+let _noiseBuf=null;
+function noiseBuffer(c){ if(_noiseBuf && _noiseBuf.__sr===c.sampleRate) return _noiseBuf; const b=c.createBuffer(1, Math.floor(c.sampleRate*0.8), c.sampleRate); const d=b.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=Math.random()*2-1; b.__sr=c.sampleRate; _noiseBuf=b; return b; }
+function playDrum(type){
+  try{ const c=noteCtx(); if(!c) return; const now=c.currentTime;
+    if(type==='kick'||type==='tom'){ const o=c.createOscillator(), g=c.createGain(); o.type='sine';
+      const hi=type==='kick'?150:240, lo=type==='kick'?50:110, dur=type==='kick'?0.24:0.32;
+      o.frequency.setValueAtTime(hi,now); o.frequency.exponentialRampToValueAtTime(lo,now+dur*0.6);
+      g.gain.setValueAtTime(0.9,now); g.gain.exponentialRampToValueAtTime(0.001,now+dur);
+      o.connect(g); g.connect(c.destination); o.start(now); o.stop(now+dur+0.02); return; }
+    const src=c.createBufferSource(); src.buffer=noiseBuffer(c);
+    const f=c.createBiquadFilter(); const g=c.createGain(); let dur=0.2;
+    if(type==='hat'){ f.type='highpass'; f.frequency.value=8000; g.gain.setValueAtTime(0.45,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.05); dur=0.06; }
+    else if(type==='snare'){ f.type='highpass'; f.frequency.value=1800; g.gain.setValueAtTime(0.6,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.2); dur=0.22;
+      const o=c.createOscillator(),og=c.createGain(); o.type='triangle'; o.frequency.setValueAtTime(180,now); og.gain.setValueAtTime(0.4,now); og.gain.exponentialRampToValueAtTime(0.001,now+0.12); o.connect(og); og.connect(c.destination); o.start(now); o.stop(now+0.13); }
+    else if(type==='crash'){ f.type='highpass'; f.frequency.value=6000; g.gain.setValueAtTime(0.4,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.7); dur=0.72; }
+    else if(type==='clap'){ f.type='bandpass'; f.frequency.value=1500; g.gain.setValueAtTime(0.6,now); g.gain.exponentialRampToValueAtTime(0.001,now+0.15); dur=0.16; }
+    src.connect(f); f.connect(g); g.connect(c.destination); src.start(now); src.stop(now+dur);
+  }catch(e){}
+}
+
+// ─── DRUM KIT (free play) ───
+function startDrumKit(){
+  const cv=setupCanvas(); const ctx=cv.getContext('2d');
+  const W=cv.width, H=cv.height;
+  const PADS=[
+    {name:'KICK', type:'kick', emoji:'🦵', col:'#FF5C7A'},
+    {name:'SNARE',type:'snare',emoji:'🥁', col:'#FF9F40'},
+    {name:'HI-HAT',type:'hat', emoji:'🎩', col:'#FFD93D'},
+    {name:'TOM',  type:'tom',  emoji:'🪘', col:'#4CD964'},
+    {name:'CRASH',type:'crash',emoji:'💥', col:'#4DA3FF'},
+    {name:'CLAP', type:'clap', emoji:'👏', col:'#A06CFF'}
+  ];
+  const barH=Math.max(52,Math.round(H*0.09)), bgap=10, barY=H-barH-10;
+  const cols=2, rows=3, gap=12, top=Math.max(48,Math.round(H*0.11)), padBottom=barY-8;
+  const pw=(W-gap*(cols+1))/cols, ph=(padBottom-top-gap*(rows+1))/rows;
+  let pulse=new Array(PADS.length).fill(0), taps=0, t=0, particles=[];
+  let mode='idle', rec=[], recStart=0, recDur=0, playStart=0, playIdx=0, flashBtn=[0,0,0];
+  noteCtx();
+  function rectFor(i){ const r=Math.floor(i/cols), c=i%cols; return {x:gap+c*(pw+gap), y:top+r*(ph+gap), w:pw, h:ph}; }
+  function btnRect(k){ const bw=(W-bgap*4)/3; return {x:bgap+k*(bw+bgap), y:barY, w:bw, h:barH}; }
+  function rrect(x,y,w,h,rd){ ctx.beginPath(); ctx.moveTo(x+rd,y); ctx.arcTo(x+w,y,x+w,y+h,rd); ctx.arcTo(x+w,y+h,x,y+h,rd); ctx.arcTo(x,y+h,x,y,rd); ctx.arcTo(x,y,x+w,y,rd); ctx.closePath(); }
+  function burst(x,y,c){ for(let i=0;i<12;i++){ const a=Math.random()*6.28, sp=1.5+Math.random()*3; particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,r:2+Math.random()*3,c}); } }
+  function hit(i){ pulse[i]=1; playDrum(PADS[i].type); const b=rectFor(i); burst(b.x+b.w/2,b.y+b.h/2,PADS[i].col); }
+  function startRec(){ mode='recording'; rec=[]; recStart=Date.now(); setMsg('🔴 Recording — tap a beat!'); }
+  function stopRec(){ if(mode==='recording'){ recDur=Math.max(Date.now()-recStart, rec.length?rec[rec.length-1].t+300:0); mode='idle'; setMsg(rec.length?'Got it! Press PLAY or LOOP ▶':'Tap the pads to make a beat!'); } }
+  function startPlay(isLoop){ if(mode==='recording') stopRec(); if(!rec.length){ setMsg('Record a beat first — press ● REC'); return; } mode=isLoop?'looping':'playing'; playIdx=0; playStart=Date.now(); setMsg(isLoop?'🔁 Looping — play along!':'▶ Playing your beat...'); }
+  function handleBtn(k){ flashBtn[k]=1;
+    if(k===0){ if(mode==='recording') stopRec(); else startRec(); }
+    else if(k===1){ startPlay(false); }
+    else { if(mode==='looping'){ mode='idle'; setMsg('Tap the pads to make a beat!'); } else startPlay(true); } }
+  const tap=(e)=>{ const r=cv.getBoundingClientRect(); const x=((e.clientX!=null?e.clientX:(e.touches&&e.touches[0].clientX))||0)-r.left; const y=((e.clientY!=null?e.clientY:(e.touches&&e.touches[0].clientY))||0)-r.top;
+    if(y>=barY-2){ for(let k=0;k<3;k++){ const b=btnRect(k); if(x>=b.x&&x<=b.x+b.w){ handleBtn(k); return; } } return; }
+    for(let i=0;i<PADS.length;i++){ const b=rectFor(i); if(x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h){ hit(i); if(mode==='recording') rec.push({i:i, t:Date.now()-recStart}); taps++; setScore(taps); return; } } };
+  cv.addEventListener('pointerdown',tap);
+  _arcadeCleanup=()=>{ cv.removeEventListener('pointerdown',tap); };
+  setMsg('Tap the pads to make your own beat!'); setScore(0);
+  function step(){
+    t++;
+    if(mode==='playing'||mode==='looping'){ const el=Date.now()-playStart;
+      while(playIdx<rec.length && rec[playIdx].t<=el){ hit(rec[playIdx].i); playIdx++; }
+      if(playIdx>=rec.length && el>=recDur){ if(mode==='looping'){ playStart=Date.now(); playIdx=0; } else { mode='idle'; setMsg('Nice beat! 🥁 Tap to play more.'); } } }
+    if(mode==='recording' && Date.now()-recStart>30000) stopRec();
+    for(let i=0;i<PADS.length;i++) if(pulse[i]>0) pulse[i]=Math.max(0,pulse[i]-0.08);
+    for(let k=0;k<3;k++) if(flashBtn[k]>0) flashBtn[k]=Math.max(0,flashBtn[k]-0.1);
+    for(let i=particles.length-1;i>=0;i--){ const q=particles[i]; q.x+=q.vx; q.y+=q.vy; q.vy+=0.2; q.life-=0.04; if(q.life<=0) particles.splice(i,1); }
+  }
+  function loop(){
+    step();
+    ctx.fillStyle='#0d0824'; ctx.fillRect(0,0,W,H);
+    const title = mode==='recording'?'🔴 Recording...': mode==='playing'?'▶ Playing your beat': mode==='looping'?'🔁 Looping — jam along!':'🥁 Drum Kit — jam away!';
+    ctx.fillStyle= mode==='recording'?'#FF6B7A':'#C8B8E8'; ctx.textAlign='center'; ctx.textBaseline='alphabetic'; ctx.font="bold 15px 'Arial',sans-serif"; ctx.fillText(title, W/2, 30);
+    for(let i=0;i<PADS.length;i++){ const b=rectFor(i), p=PADS[i]; const pl=pulse[i];
+      const sc=1+pl*0.05; const cx=b.x+b.w/2, cy=b.y+b.h/2; const w=b.w*sc, h=b.h*sc, x=cx-w/2, y=cy-h/2;
+      ctx.globalAlpha=0.7+pl*0.3; ctx.fillStyle=p.col; rrect(x,y,w,h,20); ctx.fill(); ctx.globalAlpha=1;
+      ctx.fillStyle='rgba(255,255,255,.30)'; rrect(x+6,y+6,w-12,h*0.22,10); ctx.fill();
+      if(pl>0){ ctx.strokeStyle='#fff'; ctx.lineWidth=3; rrect(x,y,w,h,20); ctx.stroke(); ctx.lineWidth=1; }
+      ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font=Math.round(h*0.28)+"px 'Arial',sans-serif"; ctx.fillText(p.emoji, cx, cy-h*0.05);
+      ctx.fillStyle='#fff'; ctx.font="bold 14px 'Arial Black',sans-serif"; ctx.fillText(p.name, cx, cy+h*0.30); ctx.textBaseline='alphabetic';
+    }
+    for(let i=particles.length-1;i>=0;i--){ const q=particles[i]; ctx.globalAlpha=Math.max(0,q.life); ctx.fillStyle=q.c; ctx.beginPath(); ctx.arc(q.x,q.y,q.r,0,7); ctx.fill(); }
+    ctx.globalAlpha=1;
+    const labels=[ mode==='recording'?'■ STOP':'● REC', '▶ PLAY', mode==='looping'?'■ STOP':'🔁 LOOP' ];
+    const bases=['#FF4757','#00D68F','#4DA3FF'];
+    const activeK = mode==='recording'?0: mode==='playing'?1: mode==='looping'?2: -1;
+    for(let k=0;k<3;k++){ const b=btnRect(k); const on=(k===activeK); const fl=flashBtn[k];
+      ctx.globalAlpha= on?1:(0.82+fl*0.18); ctx.fillStyle=bases[k]; rrect(b.x,b.y,b.w,b.h,14); ctx.fill(); ctx.globalAlpha=1;
+      if(on){ ctx.strokeStyle='#fff'; ctx.lineWidth=3; rrect(b.x,b.y,b.w,b.h,14); ctx.stroke(); ctx.lineWidth=1;
+        if(k===0 && Math.floor(t/16)%2===0){ ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(b.x+14,b.y+14,5,0,7); ctx.fill(); } }
+      ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font="bold 16px 'Arial Black',sans-serif"; ctx.fillText(labels[k], b.x+b.w/2, b.y+b.h/2+1); ctx.textBaseline='alphabetic';
+    }
+    _arcadeLoop=requestAnimationFrame(loop);
+  }
+  loop();
+}
+
+// ─── XYLOPHONE (free play) ───
+function startXylophone(){
+  const cv=setupCanvas(); const ctx=cv.getContext('2d');
+  const W=cv.width, H=cv.height;
+  const FREQ=[523.25,587.33,659.25,698.46,783.99,880.00,987.77,1046.5];
+  const NOTE=['C','D','E','F','G','A','B','C'];
+  const COL=['#FF5C7A','#FF9F40','#FFD93D','#4CD964','#34C9C9','#4DA3FF','#A06CFF','#FF5C7A'];
+  const barH=Math.max(52,Math.round(H*0.09)), bgap=10, barY=H-barH-10;
+  const n=8, top=Math.max(52,Math.round(H*0.11)), bottom=barY-8;
+  const bandH=(bottom-top)/n;
+  let pulse=new Array(n).fill(0), taps=0, t=0, particles=[];
+  let mode='idle', rec=[], recStart=0, recDur=0, playStart=0, playIdx=0, flashBtn=[0,0,0];
+  noteCtx();
+  function btnRect(k){ const bw=(W-bgap*4)/3; return {x:bgap+k*(bw+bgap), y:barY, w:bw, h:barH}; }
+  function rrect(x,y,w,h,rd){ ctx.beginPath(); ctx.moveTo(x+rd,y); ctx.arcTo(x+w,y,x+w,y+h,rd); ctx.arcTo(x+w,y+h,x,y+h,rd); ctx.arcTo(x,y+h,x,y,rd); ctx.arcTo(x,y,x+w,y,rd); ctx.closePath(); }
+  function burst(x,y,c){ for(let i=0;i<12;i++){ const a=Math.random()*6.28, sp=1.5+Math.random()*3; particles.push({x,y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,r:2+Math.random()*3,c}); } }
+  function hit(i){ pulse[i]=1; playNote(FREQ[i],0.55,'triangle'); burst(W/2, top+i*bandH+bandH/2, COL[i]); }
+  function startRec(){ mode='recording'; rec=[]; recStart=Date.now(); setMsg('🔴 Recording — play a tune!'); }
+  function stopRec(){ if(mode==='recording'){ recDur=Math.max(Date.now()-recStart, rec.length?rec[rec.length-1].t+400:0); mode='idle'; setMsg(rec.length?'Got it! Press PLAY or LOOP ▶':'Tap the bars to play!'); } }
+  function startPlay(isLoop){ if(mode==='recording') stopRec(); if(!rec.length){ setMsg('Record a tune first — press ● REC'); return; } mode=isLoop?'looping':'playing'; playIdx=0; playStart=Date.now(); setMsg(isLoop?'🔁 Looping — play along!':'▶ Playing your tune...'); }
+  function handleBtn(k){ flashBtn[k]=1;
+    if(k===0){ if(mode==='recording') stopRec(); else startRec(); }
+    else if(k===1){ startPlay(false); }
+    else { if(mode==='looping'){ mode='idle'; setMsg('Tap the bars to play!'); } else startPlay(true); } }
+  const tap=(e)=>{ const r=cv.getBoundingClientRect();
+    const x=((e.clientX!=null?e.clientX:(e.touches&&e.touches[0].clientX))||0)-r.left;
+    const y=((e.clientY!=null?e.clientY:(e.touches&&e.touches[0].clientY))||0)-r.top;
+    if(y>=barY-2){ for(let k=0;k<3;k++){ const b=btnRect(k); if(x>=b.x&&x<=b.x+b.w){ handleBtn(k); return; } } return; }
+    if(y<top||y>bottom) return; const i=Math.max(0,Math.min(n-1,Math.floor((y-top)/bandH)));
+    hit(i); if(mode==='recording') rec.push({i:i, t:Date.now()-recStart}); taps++; setScore(taps); };
+  cv.addEventListener('pointerdown',tap);
+  _arcadeCleanup=()=>{ cv.removeEventListener('pointerdown',tap); };
+  setMsg('Tap the bars to play the xylophone!'); setScore(0);
+  function step(){
+    t++;
+    if(mode==='playing'||mode==='looping'){ const el=Date.now()-playStart;
+      while(playIdx<rec.length && rec[playIdx].t<=el){ hit(rec[playIdx].i); playIdx++; }
+      if(playIdx>=rec.length && el>=recDur){ if(mode==='looping'){ playStart=Date.now(); playIdx=0; } else { mode='idle'; setMsg('Pretty tune! 🎶 Tap to play more.'); } } }
+    if(mode==='recording' && Date.now()-recStart>30000) stopRec();
+    for(let i=0;i<n;i++) if(pulse[i]>0) pulse[i]=Math.max(0,pulse[i]-0.08);
+    for(let k=0;k<3;k++) if(flashBtn[k]>0) flashBtn[k]=Math.max(0,flashBtn[k]-0.1);
+    for(let i=particles.length-1;i>=0;i--){ const q=particles[i]; q.x+=q.vx; q.y+=q.vy; q.vy+=0.2; q.life-=0.04; if(q.life<=0) particles.splice(i,1); }
+  }
+  function loop(){
+    step();
+    ctx.fillStyle='#0d0824'; ctx.fillRect(0,0,W,H);
+    const title = mode==='recording'?'🔴 Recording...': mode==='playing'?'▶ Playing your tune': mode==='looping'?'🔁 Looping — play along!':'🔔 Xylophone — make music!';
+    ctx.fillStyle= mode==='recording'?'#FF6B7A':'#C8B8E8'; ctx.textAlign='center'; ctx.textBaseline='alphabetic'; ctx.font="bold 15px 'Arial',sans-serif"; ctx.fillText(title, W/2, 28);
+    for(let i=0;i<n;i++){ const y=top+i*bandH+3, h=bandH-6; const maxW=W-40; const bw=maxW*(1-i*0.055); const x=(W-bw)/2;
+      const pl=pulse[i];
+      ctx.globalAlpha=0.75+pl*0.25; ctx.fillStyle=COL[i]; rrect(x-pl*6,y,bw+pl*12,h,10); ctx.fill(); ctx.globalAlpha=1;
+      ctx.fillStyle='rgba(255,255,255,.28)'; rrect(x+6,y+4,bw-12,h*0.26,6); ctx.fill();
+      ctx.fillStyle='rgba(0,0,0,.16)'; ctx.beginPath(); ctx.arc(x+16,y+h/2,3,0,7); ctx.fill(); ctx.beginPath(); ctx.arc(x+bw-16,y+h/2,3,0,7); ctx.fill();
+      ctx.fillStyle='#1A0A3E'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font="bold "+Math.round(Math.min(h*0.5,22))+"px 'Arial Black',sans-serif"; ctx.fillText(NOTE[i], W/2, y+h/2+1); ctx.textBaseline='alphabetic';
+      if(pl>0){ ctx.strokeStyle='#fff'; ctx.lineWidth=3; rrect(x-pl*6,y,bw+pl*12,h,10); ctx.stroke(); ctx.lineWidth=1; }
+    }
+    for(let i=particles.length-1;i>=0;i--){ const q=particles[i]; ctx.globalAlpha=Math.max(0,q.life); ctx.fillStyle=q.c; ctx.beginPath(); ctx.arc(q.x,q.y,q.r,0,7); ctx.fill(); }
+    ctx.globalAlpha=1;
+    const labels=[ mode==='recording'?'■ STOP':'● REC', '▶ PLAY', mode==='looping'?'■ STOP':'🔁 LOOP' ];
+    const bases=['#FF4757','#00D68F','#4DA3FF'];
+    const activeK = mode==='recording'?0: mode==='playing'?1: mode==='looping'?2: -1;
+    for(let k=0;k<3;k++){ const b=btnRect(k); const on=(k===activeK); const fl=flashBtn[k];
+      ctx.globalAlpha= on?1:(0.82+fl*0.18); ctx.fillStyle=bases[k]; rrect(b.x,b.y,b.w,b.h,14); ctx.fill(); ctx.globalAlpha=1;
+      if(on){ ctx.strokeStyle='#fff'; ctx.lineWidth=3; rrect(b.x,b.y,b.w,b.h,14); ctx.stroke(); ctx.lineWidth=1;
+        if(k===0 && Math.floor(t/16)%2===0){ ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(b.x+14,b.y+14,5,0,7); ctx.fill(); } }
+      ctx.fillStyle='#fff'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font="bold 16px 'Arial Black',sans-serif"; ctx.fillText(labels[k], b.x+b.w/2, b.y+b.h/2+1); ctx.textBaseline='alphabetic';
+    }
+    _arcadeLoop=requestAnimationFrame(loop);
+  }
+  loop();
+}
+
 const ARCADE_GAMES = [
   {id:"rocketdodge", emoji:"🚀", name:"Rocket Dodge", desc:"Weave through asteroids!", color:"#FF6B9D", unlockBy:{cat:"reading",tier:1}},
   {id:"froghop", emoji:"🎨", name:"Color Match", desc:"Tap shapes that match the color!", color:"#00D68F", unlockBy:{cat:"reading",tier:5}},
@@ -4352,8 +4520,8 @@ const ARCADE_GAMES = [
   {id:"molepop", emoji:"🐹", name:"Mole Pop", desc:"Tap moles, dodge bombs!", color:"#7EC850", unlockBy:{cat:"math",tier:5}},
   {id:"musictiles", emoji:"🎹", name:"Music Tiles", desc:"Press the glowing keys to play real songs!", color:"#9B5DE5", unlockBy:{cat:"reading",tier:2}},
   {id:"patterntap", emoji:"🎶", name:"Pattern Tap", desc:"Watch, listen, then tap it back!", color:"#00BBF9", unlockBy:{cat:"math",tier:3}},
-  {id:"soundmatch", emoji:"🎧", name:"Sound Match", desc:"Find the pairs that sound the same!", color:"#F15BB5", bonus:true},
-  {id:"notedetective", emoji:"🎼", name:"Note Detective", desc:"Hear a note, find its key!", color:"#FEE440", bonus:true},
+  {id:"drumkit", emoji:"🥁", name:"Drum Kit", desc:"Tap the pads to make beats!", color:"#F15BB5", bonus:true},
+  {id:"xylophone", emoji:"🔔", name:"Xylophone", desc:"Tap the rainbow bars to play!", color:"#FEE440", bonus:true},
 ];
 
 function allLevelsComplete(){
