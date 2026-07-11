@@ -173,6 +173,7 @@ function saveProgress(){
       soloCharId:   S.soloCharId,
       setupDone:    S.setupDone,
       spaceRunBest: S.spaceRunBest,
+      grandCelebrated: S.grandCelebrated,
     };
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
   } catch(e){}
@@ -338,7 +339,7 @@ let SHELDON_VOICE=true;
 const SHELDON_PRAISE=["Nice work!","You got it!","Great job!","Awesome!","Way to go!","Super star!","You did it!","Fantastic!"];
 const SHELDON_TRYAGAIN=["Good try!","Almost, keep going!","You'll get the next one!","Nice try!","Keep it up!"];
 const SHELDON_GREET=["Let's learn!","Time for some magic!","Ready to play?","Let's have fun!","Here we go!"];
-function speakSheldon(text){ try{ if(typeof window==='undefined'||!('speechSynthesis' in window))return; if(!_ttsVoice)pickVoice(); window.speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(String(text)); u.rate=1.12; u.pitch=1.45; u.volume=1; if(_ttsVoice){u.voice=_ttsVoice; u.lang=_ttsVoice.lang||'en-US';} else { u.lang='en-US'; } window.speechSynthesis.speak(u); }catch(e){} }
+function speakSheldon(text){ speakText(text, 1.12, 1.45); }
 function speakCheer(ok){ try{ if(!SHELDON_VOICE)return; const p=ok?SHELDON_PRAISE:SHELDON_TRYAGAIN; speakSheldon(p[Math.floor(Math.random()*p.length)]); }catch(e){} }
 function speakGreeting(){ try{ if(!SHELDON_VOICE)return; speakSheldon(SHELDON_GREET[Math.floor(Math.random()*SHELDON_GREET.length)]); }catch(e){} }
 function playCorrectFX(buttonEl) {
@@ -2059,6 +2060,7 @@ function render(){
   else if(S.screen==="category"){renderCategory();}
   else if(S.screen==="arcade"){renderArcade();}
   else if(S.screen==="arcadeplay"){renderArcadePlay();}
+  else if(S.screen==="celebration"){app.innerHTML=renderCelebration();setTimeout(startFireworks,80);}
 }
 
 const GAME_META={
@@ -2169,12 +2171,12 @@ function renderArcade(){
         ${best>0?`<span style="font-family:'Nunito',sans-serif;font-size:11px;font-weight:800;background:rgba(255,255,255,.25);padding:2px 8px;border-radius:8px;margin-top:2px;">🏅 Best: ${best}</span>`:''}
       </button>`;
     } else {
-      const tierName = ag.unlockBy.cat==="reading"?"📖 Reading":"🔢 Math";
+      const hint = ag.bonus ? "Finish ALL 10 levels to unlock!" : `Beat ${ag.unlockBy.cat==="reading"?"📖 Reading":"🔢 Math"} Level ${ag.unlockBy.tier} to unlock!`;
       return `<div style="background:#F5F5F5;border:2px dashed #DDD;border-radius:20px;padding:20px 12px;
         display:flex;flex-direction:column;align-items:center;gap:6px;opacity:.7;">
         <span style="font-size:44px;filter:grayscale(1);">🔒</span>
         <span style="font-family:'Bangers','Arial Black',sans-serif;font-size:15px;color:#999;letter-spacing:1px;">???</span>
-        <span style="font-family:'Nunito',sans-serif;font-size:10px;color:#AAA;text-align:center;line-height:1.3;">Beat ${tierName} Level ${ag.unlockBy.tier} to unlock!</span>
+        <span style="font-family:'Nunito',sans-serif;font-size:10px;color:#AAA;text-align:center;line-height:1.3;">${hint}</span>
       </div>`;
     }
   }).join('');
@@ -2185,7 +2187,7 @@ function renderArcade(){
       <div style="font-family:'Bangers','Arial Black',sans-serif;font-size:30px;color:#FFD93D;letter-spacing:2px;text-shadow:0 2px 8px rgba(0,0,0,.4);">👾 ARCADE</div>
     </div>
     <div style="text-align:center;font-family:'Nunito',sans-serif;font-size:13px;color:#C8B8E8;margin-bottom:18px;">
-      ${unlocked.length}/8 games unlocked · Complete levels to unlock more!
+      ${unlocked.length}/${ARCADE_GAMES.length} games unlocked · Complete levels to unlock more!
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">${cards}</div>
   </div>`;
@@ -2219,7 +2221,7 @@ function renderHome(){
       <span style="font-size:32px;">👾</span>
       <div style="text-align:left;">
         <div style="font-family:'Bangers','Arial Black',sans-serif;font-size:22px;letter-spacing:2px;">ARCADE</div>
-        <div style="font-family:'Nunito',sans-serif;font-size:11px;opacity:.9;">${getUnlockedArcade().length}/8 games unlocked!</div>
+        <div style="font-family:'Nunito',sans-serif;font-size:11px;opacity:.9;">${getUnlockedArcade().length}/${ARCADE_GAMES.length} games unlocked!</div>
       </div>
     </button>
 
@@ -2240,7 +2242,7 @@ function renderHome(){
       <button onclick="if(confirm('This will lock all levels and reset your progress. Ready to start fresh?'))clearProgress();" style="width:100%;padding:18px;background:linear-gradient(135deg,#FF6B9D,#E040A0);color:white;font-family:'Bangers','Arial Black',sans-serif;font-size:28px;letter-spacing:2px;border:none;border-radius:20px;cursor:pointer;box-shadow:0 6px 20px rgba(224,64,160,.4);">🔄 START OVER</button>
     </div>`:''}
     <div style="text-align:center;font-family:'Nunito',sans-serif;font-size:11px;color:#C8B8E8;">
-      22 GAMES · 5,000+ QUESTIONS 🌟
+      30 GAMES · 5,000+ QUESTIONS 🌟
       <span style="margin-left:12px;font-size:10px;color:#ddd;cursor:pointer;" onclick="if(confirm('Reset all progress?'))clearProgress();">↺ RESET</span>
     </div>
   </div>`;
@@ -2402,6 +2404,7 @@ function renderPlaying(app){
 }
 
 function renderResults(){
+ if(S._pendingCelebration){ S._pendingCelebration=false; setTimeout(()=>ss({screen:"celebration"}),60); }
  const{lastScore:sc,lastTotal:tot,totalStars}=S;
  const pct=sc/tot;const earned=Math.round(pct*3);const perfect=sc===tot;
  // Arcade unlock celebration banner
@@ -2512,12 +2515,44 @@ function pickVoice(){
     _ttsVoice=best||vs[0];
   }catch(e){}
 }
-function speakWord(w){ try{ if(typeof window==='undefined'||!('speechSynthesis' in window))return;
-  if(!_ttsVoice)pickVoice(); window.speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(String(w)); u.rate=0.8; u.pitch=1.1;
-  if(_ttsVoice){u.voice=_ttsVoice; u.lang=_ttsVoice.lang||'en-US';} else { u.lang='en-US'; }
-  window.speechSynthesis.speak(u); }catch(e){} }
+let _ttsKeepAlive=null;
+function _ttsStop(){ try{ if(_ttsKeepAlive){ clearInterval(_ttsKeepAlive); _ttsKeepAlive=null; } }catch(e){} }
+function speakText(text, rate, pitch){
+  try{
+    if(typeof window==='undefined' || !('speechSynthesis' in window)) return;
+    const ss=window.speechSynthesis;
+    const str=String(text||'').trim(); if(!str) return;
+    if(!_ttsVoice) pickVoice();
+    _ttsStop();
+    ss.cancel();               // clear anything queued/stuck
+    setTimeout(()=>{           // Android Chrome drops speak() called right after cancel()
+      try{
+        const u=new SpeechSynthesisUtterance(str);
+        u.rate=rate; u.pitch=pitch; u.volume=1;
+        if(_ttsVoice){ u.voice=_ttsVoice; u.lang=_ttsVoice.lang||'en-US'; } else { u.lang='en-US'; }
+        u.onend=_ttsStop; u.onerror=_ttsStop;
+        try{ ss.resume(); }catch(e){}   // un-pause a stuck synth
+        ss.speak(u);
+        // Chrome pauses synthesis after ~15s of speaking; nudge it awake
+        _ttsKeepAlive=setInterval(()=>{ try{ if(ss.speaking){ ss.resume(); } else { _ttsStop(); } }catch(e){ _ttsStop(); } }, 5000);
+      }catch(e){ _ttsStop(); }
+    }, 90);
+  }catch(e){}
+}
+function speakWord(w){ speakText(w, 0.8, 1.1); }
 try{ if(typeof window!=='undefined' && 'speechSynthesis' in window){ window.speechSynthesis.onvoiceschanged=pickVoice; pickVoice(); } }catch(e){}
+try{
+  if(typeof document!=='undefined'){
+    const _unlockTTS=()=>{ try{
+      const ss=window.speechSynthesis; if(!ss) return;
+      if(!_ttsVoice) pickVoice();
+      ss.resume();
+      const u=new SpeechSynthesisUtterance(' '); u.volume=0; ss.speak(u);   // silent primer
+    }catch(e){} };
+    document.addEventListener('pointerdown', _unlockTTS, {once:true});
+    document.addEventListener('touchstart', _unlockTTS, {once:true});
+  }
+}catch(e){}
 function rFlash(el,cards,lv,done){let i=0,sc=0,ch=null;function show(){if(i>=cards.length)return;if(ch===null)_advance=null;const c=cards[i];const col=c.type==="math"?"#00A8FF":"#FF6B9D";el.innerHTML=`${pb(i,cards.length,sc)}${ms(i===0&&ch===null?"greet":ch===null?"idle":String((c.choices||[])[ch]).toLowerCase()===String(c.answer).toLowerCase()?"correct":"wrong",'flashcards')}<div class="card" style="border-top:5px solid ${col};"><div style="position:absolute;top:14px;left:14px;background:${c.type==="math"?"linear-gradient(135deg,#00A8FF,#0077CC)":"linear-gradient(135deg,#FF6B9D,#E040A0)"};color:white;border-radius:10px;padding:3px 10px;font-family:'Bangers','Arial Black',sans-serif;font-size:13px;letter-spacing:1px;">${c.type==="math"?"🔢 MATH":"📖 READING"}</div>${c.audio?`<div style="text-align:center;margin:12px 0;"><button onclick="speakWord('${c.answer}')" style="font-size:58px;background:linear-gradient(135deg,#FFD93D,#FFB400);border:none;border-radius:24px;padding:14px 32px;cursor:pointer;box-shadow:0 6px 16px rgba(255,180,0,.45);">🔊</button><div style="font-family:'Nunito',sans-serif;font-size:14px;color:#7A6FA0;margin-top:10px;font-weight:800;">Tap to hear it again</div></div>`:c.visual?`<div style="font-size:78px;text-align:center;margin:6px 0 2px;">${c.visual}</div>`:c.type==="reading"?`<div style="font-family:'Bangers','Arial Black',sans-serif;font-size:${c.answer.length>8?"36px":c.answer.length>5?"48px":"58px"};text-align:center;margin:10px 0;color:#1A0A3E;letter-spacing:3px;background:linear-gradient(135deg,#FFF3E0,#FFE0B2);border-radius:16px;padding:10px 20px;">${c.answer}</div>`:""}<div style="font-size:22px;font-family:'Nunito',sans-serif;font-weight:800;color:#1A0A3E;text-align:center;margin-top:${c.visual?"8":"28"}px;line-height:1.4;">${c.question}</div><div class="g2" style="margin-top:14px;">${ab(c.choices||[],c.answer,ch)}</div>${ch!==null?fb(String((c.choices||[])[ch]).toLowerCase()===String(c.answer).toLowerCase(),c.answer):""}</div>
 ${maybeNextBtn(i,cards.length)}`;if(c.audio&&ch===null){speakWord(c.answer);}if(ch===null)bmc(el,ch,(ci,b)=>{ch=ci;const ok=String(cards[i].choices[ci]).toLowerCase()===String(cards[i].answer).toLowerCase();ok?playCorrectFX(b):playWrongFX(b);_advance=()=>{const ns=ok?sc+1:sc;const thr=TROPHY_THRESHOLDS[lv]||10;if(ns>=thr||i+1>=cards.length)done(ns,Math.min(i+1,cards.length));else{sc=ns;i++;ch=null;show();}};const _adv=_advance;show();setTimeout(()=>{if(_adv)_adv();},800);});}show();}
 
@@ -3222,7 +3257,7 @@ function startArcadeGame(id){
     rocketdodge: startRocketDodge, froghop: startFrogHop, balloonpop: startBalloonPop,
     starcatcher: startStarCatcher, fishfeast: startFishFeast, coindrop: startCoinDrop,
     beeflyer: startBeeFlyer, stackit: startStackIt, stackbounce: startBunnyHop, molepop: startMolePop,
-    musictiles: startMusicTiles, patterntap: startPatternTap
+    musictiles: startMusicTiles, patterntap: startPatternTap, soundmatch: startSoundMatch, notedetective: startNoteDetective
   };
   (starters[id] || (()=>{}))();
 }
@@ -3868,6 +3903,12 @@ function markGameCompleted(gameId, score) {
     // Check if this completion unlocked a new arcade game
     const newArcade = checkArcadeUnlock(S.category);
     if(newArcade) S._newArcadeGame = newArcade;
+    if(allLevelsComplete() && !S.grandCelebrated){
+      S.grandCelebrated = true;
+      S._pendingCelebration = true;
+      S._newArcadeGame = null;
+      saveProgress();
+    }
   }
 }
 
@@ -4112,25 +4153,220 @@ function startPatternTap(){
   loop();
 }
 
+// ═══════════════════ GRAND CELEBRATION ═══════════════════
+function renderCelebration(){
+  const bonus = ARCADE_GAMES.filter(a=>a.bonus);
+  return `<div style="min-height:100vh;background:#0d0824;position:relative;overflow:hidden;">
+    <canvas id="fw-canvas" style="position:absolute;top:0;left:0;width:100%;height:100%;display:block;"></canvas>
+    <div style="position:relative;z-index:2;padding:26px 18px;text-align:center;">
+      <div style="font-size:64px;animation:bounce 1s ease infinite;">🏆</div>
+      <div style="font-family:'Bangers','Arial Black',sans-serif;font-size:34px;color:#FFD93D;letter-spacing:2px;text-shadow:0 3px 12px rgba(255,217,61,.6);margin-top:6px;">YOU DID IT!</div>
+      <div style="font-family:'Bangers','Arial Black',sans-serif;font-size:20px;color:#fff;letter-spacing:1px;margin-top:4px;">ALL 10 LEVELS COMPLETE!</div>
+      <div style="font-size:36px;margin:10px 0;">🧙‍♂️✨</div>
+      <div style="font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;color:#C8B8E8;line-height:1.5;margin-bottom:16px;">Sheldon is SO proud of you!<br>You unlocked 4 secret arcade games!</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px;">
+        ${bonus.map(b=>`<div style="background:linear-gradient(135deg,${b.color},${b.color}cc);border-radius:16px;padding:14px 8px;color:#fff;box-shadow:0 4px 14px ${b.color}66;">
+          <div style="font-size:34px;">${b.emoji}</div>
+          <div style="font-family:'Bangers','Arial Black',sans-serif;font-size:14px;letter-spacing:1px;margin-top:2px;">${b.name}</div>
+        </div>`).join('')}
+      </div>
+      <button onclick="ss({screen:'arcade'})" style="width:100%;padding:16px;background:linear-gradient(135deg,#FFD93D,#F5A623);color:#1A0A3E;border:none;border-radius:16px;font-family:'Bangers','Arial Black',sans-serif;font-size:20px;letter-spacing:1px;cursor:pointer;box-shadow:0 6px 18px rgba(255,217,61,.4);">🎮 PLAY THE NEW GAMES!</button>
+      <button onclick="ss({screen:'home'})" style="width:100%;margin-top:10px;padding:12px;background:rgba(255,255,255,.12);color:#fff;border:none;border-radius:14px;font-family:'Nunito',sans-serif;font-weight:800;font-size:14px;cursor:pointer;">🏠 Back Home</button>
+    </div>
+  </div>`;
+}
+
+function startFireworks(){
+  const cv=document.getElementById('fw-canvas'); if(!cv) return;
+  const W=cv.clientWidth||360, H=cv.clientHeight||640;
+  cv.width=W; cv.height=H;
+  const ctx=cv.getContext('2d');
+  const COLORS=['#FF5C7A','#FFD93D','#4CD964','#4DA3FF','#A06CFF','#FF9F40','#34C9C9'];
+  const TUNE=[[0,523.25],[16,659.25],[32,783.99],[48,1046.5],[80,783.99],[96,1046.5],[124,1318.5]];
+  let rockets=[], parts=[], t=0, ti=0;
+  try{ noteCtx(); }catch(e){}
+  function launch(){ const x=W*(0.15+Math.random()*0.7); rockets.push({x:x,y:H+10,vx:(Math.random()-0.5)*0.8,vy:-(6+Math.random()*3),ty:H*(0.15+Math.random()*0.35),c:COLORS[Math.floor(Math.random()*COLORS.length)]}); }
+  function boom(x,y,c){ const n=26+Math.floor(Math.random()*16); for(let i=0;i<n;i++){ const a=(i/n)*6.283+Math.random()*0.2, sp=1.5+Math.random()*3.5; parts.push({x:x,y:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:1,c:(Math.random()<0.25?'#fff':c),r:1.5+Math.random()*2.5}); } try{ playNote(180+Math.random()*120,0.25,'sine'); }catch(e){} }
+  function loop(){
+    t++;
+    const beat=t%200; if(beat===0) ti=0;
+    if(ti<TUNE.length && beat>=TUNE[ti][0]){ try{ playNote(TUNE[ti][1],0.5,'triangle'); }catch(e){} ti++; }
+    if(t%22===0) launch();
+    ctx.fillStyle='rgba(13,8,36,.28)'; ctx.fillRect(0,0,W,H);
+    for(let i=rockets.length-1;i>=0;i--){ const r=rockets[i]; r.x+=r.vx; r.y+=r.vy; r.vy+=0.06;
+      ctx.fillStyle=r.c; ctx.beginPath(); ctx.arc(r.x,r.y,2.4,0,7); ctx.fill();
+      if(r.y<=r.ty||r.vy>=0){ boom(r.x,r.y,r.c); rockets.splice(i,1); } }
+    for(let i=parts.length-1;i>=0;i--){ const p=parts[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=0.045; p.vx*=0.99; p.life-=0.012;
+      if(p.life<=0){ parts.splice(i,1); continue; }
+      ctx.globalAlpha=Math.max(0,p.life); ctx.fillStyle=p.c; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fill(); }
+    ctx.globalAlpha=1;
+    _arcadeLoop=requestAnimationFrame(loop);
+  }
+  for(let i=0;i<3;i++) launch();
+  loop();
+}
+
+// ─── SOUND MATCH (audio memory pairs) ───
+function startSoundMatch(){
+  const cv=setupCanvas(); const ctx=cv.getContext('2d');
+  const W=cv.width, H=cv.height;
+  const FREQ=[523.25,587.33,659.25,698.46,783.99,880.00,987.77];
+  const NOTE=['C','D','E','F','G','A','B'];
+  const COL=['#FF5C7A','#FF9F40','#FFD93D','#4CD964','#34C9C9','#4DA3FF','#A06CFF'];
+  const cols=4, rows=2, pad=10;
+  const top=Math.max(50,H*0.14);
+  const cw=(W-pad*(cols+1))/cols, chh=Math.min((H-top-pad*(rows+1)-10)/rows, cw*1.25);
+  let cards=[], first=-1, lock=0, lives=3, score=0, alive=true, t=0, round=1, particles=[];
+  function deal(){ const notes=sh([0,1,2,3,4,5,6]).slice(0,4); const pool=sh(notes.concat(notes));
+    cards=pool.map(n=>({n:n,up:false,done:false,anim:0})); first=-1; lock=0; }
+  function rectFor(i){ const r=Math.floor(i/cols), c=i%cols; return {x:pad+c*(cw+pad), y:top+r*(chh+pad), w:cw, h:chh}; }
+  function rrect(x,y,w,h,rd){ ctx.beginPath(); ctx.moveTo(x+rd,y); ctx.arcTo(x+w,y,x+w,y+h,rd); ctx.arcTo(x+w,y+h,x,y+h,rd); ctx.arcTo(x,y+h,x,y,rd); ctx.arcTo(x,y,x+w,y,rd); ctx.closePath(); }
+  function burst(x,y,c,n){ for(let i=0;i<n;i++){ const a=Math.random()*6.28, sp=1+Math.random()*3.5; particles.push({x:x,y:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1.5,life:1,r:2+Math.random()*3,c:c}); } }
+  noteCtx(); deal();
+  const tap=(e)=>{ if(!alive||lock>0) return; const r=cv.getBoundingClientRect();
+    const x=((e.clientX!=null?e.clientX:(e.touches&&e.touches[0].clientX))||0)-r.left;
+    const y=((e.clientY!=null?e.clientY:(e.touches&&e.touches[0].clientY))||0)-r.top;
+    for(let i=0;i<cards.length;i++){ const b=rectFor(i); const c=cards[i];
+      if(x>=b.x&&x<=b.x+b.w&&y>=b.y&&y<=b.y+b.h){
+        if(c.done||c.up) return;
+        c.up=true; c.anim=10; playNote(FREQ[c.n],0.5,'triangle');
+        if(first<0){ first=i; }
+        else {
+          if(cards[first].n===c.n){ cards[first].done=true; c.done=true; score++; setScore(score);
+            burst(b.x+b.w/2,b.y+b.h/2,COL[c.n],14); first=-1;
+            if(cards.every(k=>k.done)){ round++; lock=40; setMsg('Great! New board...'); }
+          } else { lock=44; lives--; }
+        }
+        return;
+      } }
+  };
+  cv.addEventListener('pointerdown',tap);
+  _arcadeCleanup=()=>{ cv.removeEventListener('pointerdown',tap); };
+  setMsg('Tap two cards that sound the SAME!'); setScore(0);
+  function step(){ t++;
+    for(const c of cards) if(c.anim>0) c.anim--;
+    for(let i=particles.length-1;i>=0;i--){ const p=particles[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=0.25; p.life-=0.03; if(p.life<=0) particles.splice(i,1); }
+    if(lock>0){ lock--;
+      if(lock===0){
+        if(cards.every(k=>k.done)){ deal(); setMsg('Tap two cards that sound the SAME!'); }
+        else { cards.forEach(c=>{ if(!c.done) c.up=false; }); first=-1; if(lives<=0) alive=false; }
+      } }
+  }
+  function loop(){
+    if(alive) step();
+    ctx.fillStyle='#0d0824'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#C8B8E8'; ctx.textAlign='center'; ctx.textBaseline='alphabetic'; ctx.font="bold 15px 'Arial',sans-serif";
+    ctx.fillText('🎧 Board '+round, W/2, 34);
+    for(let i=0;i<cards.length;i++){ const b=rectFor(i), c=cards[i];
+      const show=c.up||c.done;
+      ctx.fillStyle= c.done? COL[c.n] : (show? COL[c.n] : 'rgba(255,255,255,.12)');
+      rrect(b.x,b.y,b.w,b.h,14); ctx.fill();
+      if(show){ ctx.fillStyle='rgba(255,255,255,.28)'; rrect(b.x+5,b.y+5,b.w-10,b.h*0.26,7); ctx.fill();
+        ctx.fillStyle='#1A0A3E'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font='bold '+Math.round(b.h*0.40)+"px 'Arial Black',sans-serif"; ctx.fillText(NOTE[c.n], b.x+b.w/2, b.y+b.h/2+1); }
+      else { ctx.fillStyle='rgba(255,255,255,.55)'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font=Math.round(b.h*0.38)+"px 'Arial',sans-serif"; ctx.fillText('🎵', b.x+b.w/2, b.y+b.h/2+1); }
+      if(c.done){ ctx.globalAlpha=0.35; ctx.fillStyle='#fff'; rrect(b.x,b.y,b.w,b.h,14); ctx.fill(); ctx.globalAlpha=1; }
+      ctx.textBaseline='alphabetic'; }
+    for(const p of particles){ ctx.globalAlpha=Math.max(0,p.life); ctx.fillStyle=p.c; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fill(); }
+    ctx.globalAlpha=1;
+    ctx.font="20px 'Arial',sans-serif"; ctx.textAlign='left'; ctx.textBaseline='top';
+    for(let i=0;i<3;i++){ ctx.globalAlpha=i<lives?1:0.25; ctx.fillText('❤️',10+i*26,8); }
+    ctx.globalAlpha=1; ctx.textBaseline='alphabetic';
+    if(alive){ _arcadeLoop=requestAnimationFrame(loop); }
+    else { setTimeout(()=>arcadeGameOver('soundmatch',score),400); }
+  }
+  loop();
+}
+
+// ─── NOTE DETECTIVE (ear training) ───
+function startNoteDetective(){
+  const cv=setupCanvas(); const ctx=cv.getContext('2d');
+  const W=cv.width, H=cv.height;
+  const N=7, laneW=W/N;
+  const FREQ=[523.25,587.33,659.25,698.46,783.99,880.00,987.77];
+  const NOTE=['C','D','E','F','G','A','B'];
+  const COL=['#FF5C7A','#FF9F40','#FFD93D','#4CD964','#34C9C9','#4DA3FF','#A06CFF'];
+  const kbTop=H*0.42, kbH=H-kbTop-14;
+  const btn={x:W/2-88,y:H*0.16,w:176,h:64};
+  let target=0, score=0, lives=3, alive=true, t=0, flash=new Array(N).fill(0), wrong=0, good=0, particles=[], waitPlay=0;
+  noteCtx();
+  function rrect(x,y,w,h,rd){ ctx.beginPath(); ctx.moveTo(x+rd,y); ctx.arcTo(x+w,y,x+w,y+h,rd); ctx.arcTo(x+w,y+h,x,y+h,rd); ctx.arcTo(x,y+h,x,y,rd); ctx.arcTo(x,y,x+w,y,rd); ctx.closePath(); }
+  function burst(x,y,c,n){ for(let i=0;i<n;i++){ const a=Math.random()*6.28, sp=1+Math.random()*3.5; particles.push({x:x,y:y,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-1.5,life:1,r:2+Math.random()*3,c:c}); } }
+  function playTarget(){ playNote(FREQ[target],0.6,'triangle'); }
+  function newTarget(){ target=Math.floor(Math.random()*N); waitPlay=18; }
+  newTarget();
+  const tap=(e)=>{ if(!alive) return; const r=cv.getBoundingClientRect();
+    const x=((e.clientX!=null?e.clientX:(e.touches&&e.touches[0].clientX))||0)-r.left;
+    const y=((e.clientY!=null?e.clientY:(e.touches&&e.touches[0].clientY))||0)-r.top;
+    if(x>=btn.x&&x<=btn.x+btn.w&&y>=btn.y&&y<=btn.y+btn.h){ playTarget(); return; }
+    if(y<kbTop) return;
+    const lane=Math.max(0,Math.min(N-1,Math.floor(x/laneW)));
+    flash[lane]=12; playNote(FREQ[lane],0.45,'triangle');
+    if(lane===target){ score++; setScore(score); good=26; burst(lane*laneW+laneW/2,kbTop,COL[lane],14); newTarget(); }
+    else { lives--; wrong=26; if(lives<=0){ alive=false; } else { waitPlay=26; } }
+  };
+  cv.addEventListener('pointerdown',tap);
+  _arcadeCleanup=()=>{ cv.removeEventListener('pointerdown',tap); };
+  setMsg('Listen, then tap the key you heard!'); setScore(0);
+  function step(){ t++;
+    if(waitPlay>0){ waitPlay--; if(waitPlay===0) playTarget(); }
+    for(let i=0;i<N;i++) if(flash[i]>0) flash[i]--;
+    if(good>0) good--; if(wrong>0) wrong--;
+    for(let i=particles.length-1;i>=0;i--){ const p=particles[i]; p.x+=p.vx; p.y+=p.vy; p.vy+=0.25; p.life-=0.03; if(p.life<=0) particles.splice(i,1); }
+  }
+  function loop(){
+    if(alive) step();
+    ctx.fillStyle='#0d0824'; ctx.fillRect(0,0,W,H);
+    ctx.fillStyle='#C8B8E8'; ctx.textAlign='center'; ctx.textBaseline='alphabetic'; ctx.font="bold 15px 'Arial',sans-serif";
+    ctx.fillText('🎼 Which note was that?', W/2, 40);
+    const pulse=0.5+0.5*Math.sin(t*0.12);
+    ctx.fillStyle='rgba(254,228,64,'+(0.75+0.25*pulse).toFixed(3)+')'; rrect(btn.x,btn.y,btn.w,btn.h,18); ctx.fill();
+    ctx.fillStyle='#1A0A3E'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font="bold 22px 'Arial Black',sans-serif";
+    ctx.fillText('🔊 PLAY', btn.x+btn.w/2, btn.y+btn.h/2+1); ctx.textBaseline='alphabetic';
+    if(good>0){ ctx.fillStyle='#00D68F'; ctx.textAlign='center'; ctx.font="bold 20px 'Arial Black',sans-serif"; ctx.fillText('🎉 YES!', W/2, btn.y+btn.h+34); }
+    else if(wrong>0){ ctx.fillStyle='#FF4757'; ctx.textAlign='center'; ctx.font="bold 18px 'Arial Black',sans-serif"; ctx.fillText('Try again — listen!', W/2, btn.y+btn.h+34); }
+    for(const p of particles){ ctx.globalAlpha=Math.max(0,p.life); ctx.fillStyle=p.c; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,7); ctx.fill(); }
+    ctx.globalAlpha=1;
+    for(let i=0;i<N;i++){ const x=i*laneW, lit=flash[i]>0;
+      ctx.fillStyle= lit?COL[i]:'rgba(255,255,255,.10)'; rrect(x+2,kbTop,laneW-4,kbH,10); ctx.fill();
+      ctx.fillStyle= lit?'#fff':COL[i]; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.font='bold '+Math.round(Math.min(kbH*0.18,laneW*0.5))+"px 'Arial Black',sans-serif";
+      ctx.fillText(NOTE[i], x+laneW/2, kbTop+kbH*0.72); ctx.textBaseline='alphabetic'; }
+    ctx.font="20px 'Arial',sans-serif"; ctx.textAlign='left'; ctx.textBaseline='top';
+    for(let i=0;i<3;i++){ ctx.globalAlpha=i<lives?1:0.25; ctx.fillText('❤️',10+i*26,8); }
+    ctx.globalAlpha=1; ctx.textBaseline='alphabetic';
+    if(alive){ _arcadeLoop=requestAnimationFrame(loop); }
+    else { setTimeout(()=>arcadeGameOver('notedetective',score),400); }
+  }
+  loop();
+}
+
 const ARCADE_GAMES = [
   {id:"rocketdodge", emoji:"🚀", name:"Rocket Dodge", desc:"Weave through asteroids!", color:"#FF6B9D", unlockBy:{cat:"reading",tier:1}},
-  {id:"froghop", emoji:"🎨", name:"Color Match", desc:"Tap shapes that match the color!", color:"#00D68F", unlockBy:{cat:"reading",tier:2}},
+  {id:"froghop", emoji:"🎨", name:"Color Match", desc:"Tap shapes that match the color!", color:"#00D68F", unlockBy:{cat:"reading",tier:5}},
   {id:"balloonpop", emoji:"🎈", name:"Balloon Pop", desc:"Pop them before they fly away!", color:"#FF4757", unlockBy:{cat:"reading",tier:3}},
   {id:"starcatcher", emoji:"⭐", name:"Star Catcher", desc:"Catch the falling stars!", color:"#FFD93D", unlockBy:{cat:"reading",tier:4}},
   {id:"fishfeast", emoji:"🐟", name:"Fish Feast", desc:"Eat smaller fish, dodge big ones!", color:"#00A8FF", unlockBy:{cat:"math",tier:1}},
   {id:"coindrop", emoji:"🪙", name:"Coin Drop", desc:"Drop a coin into a prize!", color:"#FFB400", unlockBy:{cat:"math",tier:2}},
-  {id:"beeflyer", emoji:"🐝", name:"Bee Flyer", desc:"Tap to keep flying!", color:"#FFC312", unlockBy:{cat:"math",tier:3}},
-  {id:"stackit", emoji:"🗼", name:"Stack It", desc:"Tap to stack the treats!", color:"#00A8FF", unlockBy:{cat:"math",tier:4}},
-  {id:"stackbounce", emoji:"🐰", name:"Bunny Hop", desc:"Tap to hop over the rocks!", color:"#46C26B", unlockBy:{cat:"reading",tier:1}},
-  {id:"molepop", emoji:"🐹", name:"Mole Pop", desc:"Tap moles, dodge bombs!", color:"#7EC850", unlockBy:{cat:"math",tier:1}},
+  {id:"beeflyer", emoji:"🐝", name:"Bee Flyer", desc:"Tap to keep flying!", color:"#FFC312", unlockBy:{cat:"math",tier:4}},
+  {id:"stackit", emoji:"🗼", name:"Stack It", desc:"Tap to stack the treats!", color:"#00A8FF", bonus:true},
+  {id:"stackbounce", emoji:"🐰", name:"Bunny Hop", desc:"Tap to hop over the rocks!", color:"#46C26B", bonus:true},
+  {id:"molepop", emoji:"🐹", name:"Mole Pop", desc:"Tap moles, dodge bombs!", color:"#7EC850", unlockBy:{cat:"math",tier:5}},
   {id:"musictiles", emoji:"🎹", name:"Music Tiles", desc:"Press the glowing keys to play real songs!", color:"#9B5DE5", unlockBy:{cat:"reading",tier:2}},
   {id:"patterntap", emoji:"🎶", name:"Pattern Tap", desc:"Watch, listen, then tap it back!", color:"#00BBF9", unlockBy:{cat:"math",tier:3}},
+  {id:"soundmatch", emoji:"🎧", name:"Sound Match", desc:"Find the pairs that sound the same!", color:"#F15BB5", bonus:true},
+  {id:"notedetective", emoji:"🎼", name:"Note Detective", desc:"Hear a note, find its key!", color:"#FEE440", bonus:true},
 ];
+
+function allLevelsComplete(){
+  const c = S.completedGames || {};
+  return ["reading","math"].every(cat => CATEGORIES[cat].tiers.every(t => t.every(g => c[g])));
+}
 
 function getUnlockedArcade(){
   const completed = S.completedGames || {};
+  const bonusOK = allLevelsComplete();
   const unlocked = [];
   for(const ag of ARCADE_GAMES){
+    if(ag.bonus){ if(bonusOK) unlocked.push(ag.id); continue; }
     const tier = CATEGORIES[ag.unlockBy.cat].tiers[ag.unlockBy.tier-1];
     if(tier.every(g => completed[g])) unlocked.push(ag.id);
   }
