@@ -5701,7 +5701,8 @@ function startBallMachine(){
 
   const COLS=5, ROWS=7;
   const paletteY=30, paletteH=34, paletteGap=6;
-  const gridOriginY=paletteY+paletteH+12;
+  const modeY=paletteY+paletteH+8, modeH=16;
+  const gridOriginY=modeY+modeH+8;
   const ctrlH=40;
   const availW=W-16, availH=H-gridOriginY-ctrlH-14;
   const cellSize=Math.max(30,Math.floor(Math.min(availW/COLS, availH/ROWS)));
@@ -5726,7 +5727,8 @@ function startBallMachine(){
   ];
 
   let levelIdx=0, level=null, inventory={}, placed=new Map();
-  let heldPart=null, eraseMode=false;
+  let tool=null; // 'ramp'|'spring'|'conveyor'|'erase'
+  let flashes=[];
   let simulating=false, ball=null, simFrames=0, posHistory=[];
   let score=0, winTimer=0, failTimer=0, failMsg='';
   let particles=[];
@@ -5737,30 +5739,30 @@ function startBallMachine(){
   function isGoal(c,r){ return c===level.goal.c && r===level.goal.r; }
   function key(c,r){ return c+','+r; }
 
+  function pickDefaultTool(){
+    const first=PARTS.find(p=>inventory[p.id]>0);
+    tool = first ? first.id : 'erase';
+  }
+
   function loadLevel(idx){
     levelIdx=idx; level=LEVELS[idx]; inventory=Object.assign({},level.inv); placed=new Map();
-    heldPart=null; eraseMode=false; simulating=false; ball=null; winTimer=0; failTimer=0;
-    setMsg('Level '+(idx+1)+' of '+LEVELS.length+' — build a path to the flag! 🏁');
+    pickDefaultTool(); simulating=false; ball=null; winTimer=0; failTimer=0;
+    setMsg('Level '+(idx+1)+' of '+LEVELS.length+' — pick a part below, then tap the grid!');
   }
 
   function clearBoard(){
     if(simulating) return;
     placed.forEach(p=>{ inventory[p.type]=(inventory[p.type]||0)+1; });
     placed.clear();
+    pickDefaultTool();
     setMsg('Board cleared — try a new plan!');
   }
 
-  function placePart(c,r){
-    if(isWall(c,r)||isStart(c,r)||isGoal(c,r)) return;
-    const k=key(c,r); if(placed.has(k)) return;
-    if(!heldPart||!(inventory[heldPart]>0)) return;
-    placed.set(k,{type:heldPart, orient:0});
-    inventory[heldPart]--;
-    if(inventory[heldPart]<=0) heldPart=null;
-  }
-  function tweakPart(c,r){
-    const k=key(c,r); const p=placed.get(k); if(!p) return;
-    if(p.type==='ramp'||p.type==='conveyor') p.orient=1-p.orient;
+  function flash(c,r,color){ flashes.push({c,r,color,life:1}); }
+
+  function placePart(c,r,type){
+    placed.set(key(c,r),{type, orient:0});
+    inventory[type]--;
   }
   function erasePart(c,r){
     const k=key(c,r); const p=placed.get(k); if(!p) return;
@@ -5879,9 +5881,12 @@ function startBallMachine(){
       for(let k=0;k<n;k++){
         const b=paletteRect(k);
         if(x>=b.x&&x<=b.x+b.w){
-          if(k<PARTS.length){ const id=PARTS[k].id; if(inventory[id]>0){ heldPart=(heldPart===id?null:id); eraseMode=false; } }
-          else if(k===PARTS.length){ eraseMode=!eraseMode; heldPart=null; }
-          else { clearBoard(); }
+          if(k<PARTS.length){
+            const part=PARTS[k];
+            if(inventory[part.id]>0){ tool=part.id; setMsg('Placing '+part.emoji+' '+part.label+' — tap an empty cell'); }
+            else setMsg('Out of '+part.label+'s! Pick another part.');
+          } else if(k===PARTS.length){ tool='erase'; setMsg('🗑 Erase mode — tap a part to remove it'); }
+          else clearBoard();
           return;
         }
       }
@@ -5895,9 +5900,39 @@ function startBallMachine(){
     if(y<gridOriginY||y>gridOriginY+cellSize*ROWS) return;
     const gc=Math.floor((x-gridOriginX)/cellSize), gRow=Math.floor((y-gridOriginY)/cellSize);
     if(gc<0||gc>=COLS||gRow<0||gRow>=ROWS) return;
-    if(eraseMode) erasePart(gc,gRow);
-    else if(heldPart) placePart(gc,gRow);
-    else tweakPart(gc,gRow);
+    if(isWall(gc,gRow)||isStart(gc,gRow)||isGoal(gc,gRow)){
+      flash(gc,gRow,'#FF6B7A'); setMsg("Can't build on that square!");
+      return;
+    }
+    const k=key(gc,gRow), existing=placed.get(k);
+    if(tool==='erase'){
+      if(existing){ erasePart(gc,gRow); flash(gc,gRow,'#7CFC00'); setMsg('Removed! Pick a part below to build again.'); }
+      else { flash(gc,gRow,'#FF6B7A'); setMsg('Nothing to erase there.'); }
+      return;
+    }
+    if(existing){
+      if(existing.type===tool){
+        if(existing.type==='ramp'||existing.type==='conveyor'){ existing.orient=1-existing.orient; flash(gc,gRow,'#4DA3FF'); setMsg('Flipped!'); }
+        else { flash(gc,gRow,'#FFD93D'); setMsg('A spring is already there — bouncy!'); }
+      } else {
+        flash(gc,gRow,'#FF6B7A'); setMsg('Cell taken — tap 🗑 Erase to remove it first.');
+      }
+      return;
+    }
+    if(inventory[tool]>0){
+      placePart(gc,gRow,tool);
+      flash(gc,gRow,'#7CFC00');
+      if(inventory[tool]<=0){
+        const nextPart=PARTS.find(p=>inventory[p.id]>0);
+        tool = nextPart ? nextPart.id : 'erase';
+        setMsg(nextPart ? ('Out of that part — now placing '+nextPart.label+'!') : 'All parts placed — tap ▶ PLAY, or 🗑 to rearrange!');
+      } else {
+        const partDef=PARTS.find(p=>p.id===tool);
+        setMsg('Placed! '+inventory[tool]+' '+partDef.label+' left.');
+      }
+    } else {
+      setMsg('Out of that part! Pick another below.');
+    }
   };
   cv.addEventListener('pointerdown',tap);
   _arcadeCleanup=()=>{ cv.removeEventListener('pointerdown',tap); };
@@ -5908,6 +5943,7 @@ function startBallMachine(){
     if(simulating) stepPhysics();
     if(winTimer>0){ winTimer--; if(winTimer===0){ if(levelIdx+1<LEVELS.length) loadLevel(levelIdx+1); else setTimeout(()=>arcadeGameOver('ballmachine',score),200); } }
     if(failTimer>0) failTimer--;
+    for(let i=flashes.length-1;i>=0;i--){ flashes[i].life-=0.08; if(flashes[i].life<=0) flashes.splice(i,1); }
     for(let i=particles.length-1;i>=0;i--){ const q=particles[i]; q.x+=q.vx; q.y+=q.vy; q.vy+=0.15; q.life-=0.035; if(q.life<=0) particles.splice(i,1); }
   }
 
@@ -5942,8 +5978,8 @@ function startBallMachine(){
     for(let k=0;k<n;k++){
       const b=paletteRect(k);
       let active=false, label='', sub='';
-      if(k<PARTS.length){ const part=PARTS[k]; active=(heldPart===part.id); label=part.emoji; sub=String(inventory[part.id]||0); }
-      else if(k===PARTS.length){ active=eraseMode; label='🗑'; }
+      if(k<PARTS.length){ const part=PARTS[k]; active=(tool===part.id); label=part.emoji; sub=String(inventory[part.id]||0); }
+      else if(k===PARTS.length){ active=(tool==='erase'); label='🗑'; }
       else { label='🔄'; }
       rrect(b.x,b.y,b.w,b.h,8);
       ctx.fillStyle= active?'#FFD93D':'rgba(255,255,255,.1)'; ctx.fill();
@@ -5955,12 +5991,18 @@ function startBallMachine(){
       ctx.textBaseline='alphabetic';
     }
 
+    const curPart=PARTS.find(p=>p.id===tool);
+    const modeText = tool==='erase' ? '🗑 ERASE MODE — tap a part to remove it' : (curPart ? ('👉 Placing '+curPart.emoji+' '+curPart.label.toUpperCase()+' — tap an empty cell') : 'Pick a part below');
+    ctx.textAlign='center'; ctx.fillStyle= tool==='erase'?'#FF8FA3':'#7CFC00'; ctx.font="bold 11px 'Arial',sans-serif";
+    ctx.fillText(modeText, W/2, modeY+modeH-4);
+
     for(let c=0;c<COLS;c++) for(let r=0;r<ROWS;r++){
       const rect=cellRect(c,r);
       ctx.strokeStyle='rgba(255,255,255,.06)'; ctx.strokeRect(rect.x,rect.y,rect.w,rect.h);
     }
     level.walls.forEach(w=>{ const rect=cellRect(w.c,w.r); ctx.fillStyle='#4a3f6b'; rrect(rect.x+2,rect.y+2,rect.w-4,rect.h-4,6); ctx.fill(); });
     placed.forEach((p,k)=>{ const parts=k.split(','); drawPart(p,cellRect(Number(parts[0]),Number(parts[1]))); });
+    for(const fl of flashes){ const rect=cellRect(fl.c,fl.r); ctx.globalAlpha=Math.max(0,fl.life)*0.55; ctx.fillStyle=fl.color; rrect(rect.x+2,rect.y+2,rect.w-4,rect.h-4,6); ctx.fill(); ctx.globalAlpha=1; }
     const sr=cellRect(level.start.c,level.start.r);
     ctx.font=(cellSize*0.5)+"px 'Arial',sans-serif"; ctx.textAlign='center'; ctx.textBaseline='middle';
     ctx.fillText('🔴', sr.x+sr.w/2, sr.y+sr.h/2);
